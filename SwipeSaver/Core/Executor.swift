@@ -21,14 +21,13 @@ class Executor {
         return container.appInteractor
     }
     
+    static var webViewInteractor: WebViewInteractor {
+        return container.webViewInteractor
+    }
+    
     /// Доступ к VideoSaverInteractor
     static var videoSaverInteractor: VideoSaverInteractor {
         return container.videoSaverInteractor
-    }
-
-    /// Доступ к ThemeRepository
-    static var themeRepository: ThemeRepository {
-        return container.themeRepository
     }
     
     /// Доступ к FileManagerRepository
@@ -40,9 +39,8 @@ class Executor {
     static var userDefaultsService: UserDefaultsService {
         return container.userDefaultsService
     }
-
-    /// Доступ к ThemeService
-    static var themeService: ThemeService {
-        return container.themeService
+    
+    static var userDefaultsObserver: UserDefaultsObserver {
+        return container.userDefaultsObserver
     }
 }

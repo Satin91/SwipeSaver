@@ -37,8 +37,14 @@ final class Coordinator: ObservableObject {
     @ViewBuilder 
     func build(screen: Screen) -> some View {
         switch screen {
-        case .example:
-            EmptyView()
+        case .browserHistory(let onTapHistoryItem):
+            BrowserHistoryView(onTapHistoryItem: onTapHistoryItem)
+        case .browserFavorites(let onTapFavoriteItem):
+            FavoritesView(onTapFavorite: onTapFavoriteItem)
+        case .browserTabs(let onSwitchTab):
+            BrowserTabsView(onSwitchTab: onSwitchTab)
+        case .settings:
+            SettingsView()
         }
     }
 }

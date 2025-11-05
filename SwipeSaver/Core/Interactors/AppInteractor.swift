@@ -15,7 +15,6 @@ import SwiftUI
 final class AppInteractor: ObservableObject {
     // MARK: - Dependencies
     private let userDefaultsService = UserDefaultsService.shared
-    private let themeRepository: ThemeRepository
     
     // MARK: - Published Properties
     @Published public var appSettings: AppSettings
@@ -24,9 +23,8 @@ final class AppInteractor: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initialization
-    init(themeRepository: ThemeRepository, appSettings: AppSettings) {
+    init(appSettings: AppSettings) {
         self.appSettings = appSettings
-        self.themeRepository = themeRepository
         // Автоматически сохраняем настройки при изменении
         setupSettingsAutoSave()
     }

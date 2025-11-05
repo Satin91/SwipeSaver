@@ -11,7 +11,8 @@ import Foundation
 /// Модель настроек приложения
 struct AppSettings: Codable {
     // MARK: - Settings
-    var isDarkMode: Bool = false
+    var startPage = "https://startpage.com"
+    var enableBrowserHistory: Bool = false
     var notificationsEnabled: Bool = true
     var language: String = "en"
     

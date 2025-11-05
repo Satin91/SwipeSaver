@@ -19,7 +19,7 @@ extension String {
     public func attributed(
         phrases: [String],
         color: Color,
-        font: Font = .sfProText(size: 24, weight: .semibold),
+        font: Font = .openRunde(size: 24),
         baseColor: Color = Color.tm.title
     ) -> AttributedString {
         var attributedString = AttributedString(self)
