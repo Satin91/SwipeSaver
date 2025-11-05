@@ -19,14 +19,14 @@ struct TabBarView: View {
     
     private var tabView: some View {
         TabView(selection: $selection) {
-            EmptyView()
+            SaverView()
                 .tabItem {
                     Label("Home", systemImage: "house.fill") 
                 }
                 .tag(0)
             
             EmptyView()
-                .tabItem { 
+                .tabItem {
                     Label("Example", systemImage: "star.fill") 
                 }
                 .tag(1)

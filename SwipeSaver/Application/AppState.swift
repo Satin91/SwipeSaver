@@ -31,15 +31,15 @@ final class AppState: ObservableObject {
     
     // MARK: - Initialization
     init() {
-        let isOnboardingShown = userDefaultsService.load(
-            Bool.self,
-            forKey: .onboardingCompleted
-        ) ?? false
-        
-        self.isFirstLoad = userDefaultsService.load(
-            Bool.self,
-            forKey: .isFirstLoad
-        ) ?? true
+//        let isOnboardingShown = userDefaultsService.load(
+//            Bool.self,
+//            forKey: .onboardingCompleted
+//        ) ?? false
+//        
+//        self.isFirstLoad = userDefaultsService.load(
+//            Bool.self,
+//            forKey: .isFirstLoad
+//        ) ?? true
         
         // Всегда начинаем с splash screen
         appCheck()

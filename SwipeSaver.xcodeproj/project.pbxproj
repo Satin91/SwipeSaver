@@ -38,6 +38,13 @@
 		8E62A72B2EBB59490093DBF2 /* SwipeSaverApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A72A2EBB59490093DBF2 /* SwipeSaverApp.swift */; };
 		8E62A72F2EBB594A0093DBF2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E62A72E2EBB594A0093DBF2 /* Assets.xcassets */; };
 		8E62A7322EBB594A0093DBF2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E62A7312EBB594A0093DBF2 /* Preview Assets.xcassets */; };
+		8E62A74B2EBB91910093DBF2 /* VideoSaverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A74A2EBB91910093DBF2 /* VideoSaverService.swift */; };
+		8E62A74D2EBB91980093DBF2 /* VideoSaverRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A74C2EBB91980093DBF2 /* VideoSaverRepository.swift */; };
+		8E62A74F2EBB91A00093DBF2 /* VideoSaverInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A74E2EBB91A00093DBF2 /* VideoSaverInteractor.swift */; };
+		8E62A7542EBB94E40093DBF2 /* FileManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A7532EBB94E40093DBF2 /* FileManagerService.swift */; };
+		8E62A7562EBB94EB0093DBF2 /* FileManagerRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A7552EBB94EA0093DBF2 /* FileManagerRepository.swift */; };
+		8E62A7592EBB954D0093DBF2 /* VideoSaverModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A7582EBB954D0093DBF2 /* VideoSaverModels.swift */; };
+		8E62A75C2EBB963C0093DBF2 /* SaverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A75B2EBB963C0093DBF2 /* SaverView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +80,13 @@
 		8E62A72A2EBB59490093DBF2 /* SwipeSaverApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeSaverApp.swift; sourceTree = "<group>"; };
 		8E62A72E2EBB594A0093DBF2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8E62A7312EBB594A0093DBF2 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		8E62A74A2EBB91910093DBF2 /* VideoSaverService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoSaverService.swift; sourceTree = "<group>"; };
+		8E62A74C2EBB91980093DBF2 /* VideoSaverRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoSaverRepository.swift; sourceTree = "<group>"; };
+		8E62A74E2EBB91A00093DBF2 /* VideoSaverInteractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoSaverInteractor.swift; sourceTree = "<group>"; };
+		8E62A7532EBB94E40093DBF2 /* FileManagerService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileManagerService.swift; sourceTree = "<group>"; };
+		8E62A7552EBB94EA0093DBF2 /* FileManagerRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileManagerRepository.swift; sourceTree = "<group>"; };
+		8E62A7582EBB954D0093DBF2 /* VideoSaverModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoSaverModels.swift; sourceTree = "<group>"; };
+		8E62A75B2EBB963C0093DBF2 /* SaverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaverView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +119,7 @@
 		8E62A6E72EBB59480093DBF2 /* SwipeSaver */ = {
 			isa = PBXGroup;
 			children = (
+				8E62A7502EBB93050093DBF2 /* Models */,
 				8E62A7392EBB5B360093DBF2 /* Application */,
 				8E62A7382EBB5B2F0093DBF2 /* Core */,
 				8E62A73B2EBB5B4D0093DBF2 /* Screens */,
@@ -130,6 +145,7 @@
 		8E62A7382EBB5B2F0093DBF2 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				8E62A7572EBB954D0093DBF2 /* Models */,
 				8E62A6EC2EBB59480093DBF2 /* Constants.swift */,
 				8E62A7442EBB5CF00093DBF2 /* Navigation */,
 				8E62A6E82EBB59480093DBF2 /* DIContainer.swift */,
@@ -154,6 +170,8 @@
 		8E62A73A2EBB5B420093DBF2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				8E62A7532EBB94E40093DBF2 /* FileManagerService.swift */,
+				8E62A74A2EBB91910093DBF2 /* VideoSaverService.swift */,
 				8E62A6FA2EBB59480093DBF2 /* ThemeService.swift */,
 				8E62A6F62EBB59480093DBF2 /* UserDefaultsKeys.swift */,
 				8E62A6F42EBB59480093DBF2 /* UserDefaultsService.swift */,
@@ -164,7 +182,10 @@
 		8E62A73B2EBB5B4D0093DBF2 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				8E62A75A2EBB96330093DBF2 /* Saver */,
 				8E62A73E2EBB5C110093DBF2 /* Main */,
+				8E62A7492EBB60C70093DBF2 /* Downloads */,
+				8E62A7482EBB60BE0093DBF2 /* UserFiles */,
 				8E62A7452EBB5D940093DBF2 /* Settings */,
 				8E62A7462EBB5D9F0093DBF2 /* SplashScreen */,
 				8E62A7472EBB5DA80093DBF2 /* Onboarding */,
@@ -201,6 +222,8 @@
 		8E62A73F2EBB5C1C0093DBF2 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				8E62A7552EBB94EA0093DBF2 /* FileManagerRepository.swift */,
+				8E62A74C2EBB91980093DBF2 /* VideoSaverRepository.swift */,
 				8E62A6F22EBB59480093DBF2 /* ThemeRepository.swift */,
 			);
 			path = Repositories;
@@ -209,6 +232,7 @@
 		8E62A7402EBB5C290093DBF2 /* Interactors */ = {
 			isa = PBXGroup;
 			children = (
+				8E62A74E2EBB91A00093DBF2 /* VideoSaverInteractor.swift */,
 				8E62A6EE2EBB59480093DBF2 /* AppInteractor.swift */,
 			);
 			path = Interactors;
@@ -274,6 +298,43 @@
 				8E62A7282EBB59490093DBF2 /* OnboardingView.swift */,
 			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		8E62A7482EBB60BE0093DBF2 /* UserFiles */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = UserFiles;
+			sourceTree = "<group>";
+		};
+		8E62A7492EBB60C70093DBF2 /* Downloads */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Downloads;
+			sourceTree = "<group>";
+		};
+		8E62A7502EBB93050093DBF2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		8E62A7572EBB954D0093DBF2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8E62A7582EBB954D0093DBF2 /* VideoSaverModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		8E62A75A2EBB96330093DBF2 /* Saver */ = {
+			isa = PBXGroup;
+			children = (
+				8E62A75B2EBB963C0093DBF2 /* SaverView.swift */,
+			);
+			path = Saver;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -352,12 +413,16 @@
 				8E62A7152EBB59480093DBF2 /* LoaderView.swift in Sources */,
 				8E62A6F52EBB59480093DBF2 /* UserDefaultsService.swift in Sources */,
 				8E62A7012EBB59480093DBF2 /* TabBarView.swift in Sources */,
+				8E62A7592EBB954D0093DBF2 /* VideoSaverModels.swift in Sources */,
+				8E62A74B2EBB91910093DBF2 /* VideoSaverService.swift in Sources */,
 				8E62A7092EBB59480093DBF2 /* Colors.swift in Sources */,
 				8E62A72B2EBB59490093DBF2 /* SwipeSaverApp.swift in Sources */,
 				8E62A7192EBB59480093DBF2 /* ErrorAlertModifier.swift in Sources */,
 				8E62A6E92EBB59480093DBF2 /* DIContainer.swift in Sources */,
 				8E62A6F72EBB59480093DBF2 /* UserDefaultsKeys.swift in Sources */,
 				8E62A7292EBB59490093DBF2 /* OnboardingView.swift in Sources */,
+				8E62A74F2EBB91A00093DBF2 /* VideoSaverInteractor.swift in Sources */,
+				8E62A7542EBB94E40093DBF2 /* FileManagerService.swift in Sources */,
 				8E62A71B2EBB59480093DBF2 /* InfoAlertModifier.swift in Sources */,
 				8E62A6FB2EBB59480093DBF2 /* ThemeService.swift in Sources */,
 				8E62A7272EBB59490093DBF2 /* SplashScreenView.swift in Sources */,
@@ -367,10 +432,13 @@
 				8E62A6FD2EBB59480093DBF2 /* Coordinator.swift in Sources */,
 				8E62A6F32EBB59480093DBF2 /* ThemeRepository.swift in Sources */,
 				8E62A7032EBB59480093DBF2 /* AppState.swift in Sources */,
+				8E62A74D2EBB91980093DBF2 /* VideoSaverRepository.swift in Sources */,
 				8E62A70B2EBB59480093DBF2 /* Padding.swift in Sources */,
 				8E62A6EF2EBB59480093DBF2 /* AppInteractor.swift in Sources */,
 				8E62A6F92EBB59480093DBF2 /* DeviceInfo.swift in Sources */,
 				8E62A6ED2EBB59480093DBF2 /* Constants.swift in Sources */,
+				8E62A75C2EBB963C0093DBF2 /* SaverView.swift in Sources */,
+				8E62A7562EBB94EB0093DBF2 /* FileManagerRepository.swift in Sources */,
 				8E62A7052EBB59480093DBF2 /* MainView.swift in Sources */,
 				8E62A7072EBB59480093DBF2 /* AppSettings.swift in Sources */,
 				8E62A70D2EBB59480093DBF2 /* Fonts.swift in Sources */,

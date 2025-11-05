@@ -20,10 +20,20 @@ class Executor {
     static var appInteractor: AppInteractor {
         return container.appInteractor
     }
+    
+    /// Доступ к VideoSaverInteractor
+    static var videoSaverInteractor: VideoSaverInteractor {
+        return container.videoSaverInteractor
+    }
 
     /// Доступ к ThemeRepository
     static var themeRepository: ThemeRepository {
         return container.themeRepository
+    }
+    
+    /// Доступ к FileManagerRepository
+    static var fileManagerRepository: FileManagerRepository {
+        return container.fileManagerRepository
     }
     
     /// Доступ к UserDefaultsService

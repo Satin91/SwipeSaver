@@ -25,7 +25,7 @@ struct MainView: View {
             .fullScreenCover(item: $coordinator.presentedScreen) { screen in
                 coordinator.build(screen: screen)
             }
-            .onChange(of: scenePhase) { newValue in
+            .onChange(of: scenePhase) { _, _ in
                 Task {
                     await appInteractor.appCheck()
                 }
