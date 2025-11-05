@@ -11,7 +11,7 @@ import SwiftUI
 struct SwipeSaverApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
         }
     }
 }

@@ -38,7 +38,7 @@ final class Coordinator: ObservableObject {
     func build(screen: Screen) -> some View {
         switch screen {
         case .example:
-            ExampleView()
+            EmptyView()
         }
     }
 }
