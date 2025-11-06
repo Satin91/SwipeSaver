@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E2D70C52EBCD37000534BEA /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70C42EBCD37000534BEA /* NetworkService.swift */; };
+		8E2D70C72EBCD56500534BEA /* NetworkRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70C62EBCD56500534BEA /* NetworkRepository.swift */; };
+		8E2D70CA2EBCD82200534BEA /* ApiEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70C92EBCD82200534BEA /* ApiEndpoint.swift */; };
+		8E2D70CC2EBCDE8800534BEA /* SocialVideoModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70CB2EBCDE8800534BEA /* SocialVideoModels.swift */; };
 		8E62A6E92EBB59480093DBF2 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A6E82EBB59480093DBF2 /* DIContainer.swift */; };
 		8E62A6EB2EBB59480093DBF2 /* Executor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A6EA2EBB59480093DBF2 /* Executor.swift */; };
 		8E62A6ED2EBB59480093DBF2 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A6EC2EBB59480093DBF2 /* Constants.swift */; };
@@ -88,6 +92,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8E2D70C42EBCD37000534BEA /* NetworkService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		8E2D70C62EBCD56500534BEA /* NetworkRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkRepository.swift; sourceTree = "<group>"; };
+		8E2D70C92EBCD82200534BEA /* ApiEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiEndpoint.swift; sourceTree = "<group>"; };
+		8E2D70CB2EBCDE8800534BEA /* SocialVideoModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialVideoModels.swift; sourceTree = "<group>"; };
 		8E62A6E52EBB59480093DBF2 /* SwipeSaver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwipeSaver.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E62A6E82EBB59480093DBF2 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		8E62A6EA2EBB59480093DBF2 /* Executor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Executor.swift; sourceTree = "<group>"; };
@@ -180,6 +188,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8E2D70C82EBCD80B00534BEA /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				8E2D70C42EBCD37000534BEA /* NetworkService.swift */,
+				8E2D70C92EBCD82200534BEA /* ApiEndpoint.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
 		8E62A6DC2EBB59480093DBF2 = {
 			isa = PBXGroup;
 			children = (
@@ -199,7 +216,6 @@
 		8E62A6E72EBB59480093DBF2 /* SwipeSaver */ = {
 			isa = PBXGroup;
 			children = (
-				8E62A7502EBB93050093DBF2 /* Models */,
 				8E62A7392EBB5B360093DBF2 /* Application */,
 				8E62A7382EBB5B2F0093DBF2 /* Core */,
 				8E62A73B2EBB5B4D0093DBF2 /* Screens */,
@@ -250,6 +266,7 @@
 		8E62A73A2EBB5B420093DBF2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				8E2D70C82EBCD80B00534BEA /* Networking */,
 				8E62A7E92EBBB5A10093DBF2 /* FaviconService.swift */,
 				8E62A7DD2EBBB27B0093DBF2 /* UserDefaultsKeys.swift */,
 				8E62A7642EBBB0F70093DBF2 /* UserDefaultsObserver.swift */,
@@ -310,6 +327,7 @@
 		8E62A73F2EBB5C1C0093DBF2 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				8E2D70C62EBCD56500534BEA /* NetworkRepository.swift */,
 				8E62A7DB2EBBB2470093DBF2 /* BrowserTabsRepository.swift */,
 				8E62A7D92EBBB2360093DBF2 /* WebViewRepository.swift */,
 				8E62A7552EBB94EA0093DBF2 /* FileManagerRepository.swift */,
@@ -412,16 +430,10 @@
 			path = Downloads;
 			sourceTree = "<group>";
 		};
-		8E62A7502EBB93050093DBF2 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		8E62A7572EBB954D0093DBF2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				8E2D70CB2EBCDE8800534BEA /* SocialVideoModels.swift */,
 				8E62A7CE2EBBB21B0093DBF2 /* BrowserFavoriteItem.swift */,
 				8E62A7D22EBBB21C0093DBF2 /* BrowserHistoryItem.swift */,
 				8E62A7D12EBBB21C0093DBF2 /* BrowserScripts.swift */,
@@ -573,6 +585,7 @@
 				8E62A7BD2EBBB1780093DBF2 /* WebViewPanel.swift in Sources */,
 				8E62A70F2EBB59480093DBF2 /* String+Extensions.swift in Sources */,
 				8E62A6EB2EBB59480093DBF2 /* Executor.swift in Sources */,
+				8E2D70C72EBCD56500534BEA /* NetworkRepository.swift in Sources */,
 				8E62A7C92EBBB1790093DBF2 /* BrowserTabsView.swift in Sources */,
 				8E62A7DA2EBBB2360093DBF2 /* WebViewRepository.swift in Sources */,
 				8E62A7152EBB59480093DBF2 /* LoaderView.swift in Sources */,
@@ -620,10 +633,12 @@
 				8E62A7C22EBBB1790093DBF2 /* MenuView.swift in Sources */,
 				8E62A7F02EBBB9570093DBF2 /* FaviconView.swift in Sources */,
 				8E62A7B62EBBB1780093DBF2 /* InternetBrowserView.swift in Sources */,
+				8E2D70CC2EBCDE8800534BEA /* SocialVideoModels.swift in Sources */,
 				8E62A6F92EBB59480093DBF2 /* DeviceInfo.swift in Sources */,
 				8E62A7C82EBBB1790093DBF2 /* BrowserHistoryView.swift in Sources */,
 				8E62A7C32EBBB1790093DBF2 /* AddressBarSuggestionsView.swift in Sources */,
 				8E62A7D32EBBB21C0093DBF2 /* BrowserTab.swift in Sources */,
+				8E2D70C52EBCD37000534BEA /* NetworkService.swift in Sources */,
 				8E62A7DE2EBBB27B0093DBF2 /* UserDefaultsKeys.swift in Sources */,
 				8E62A7EA2EBBB5A10093DBF2 /* FaviconService.swift in Sources */,
 				8E62A6ED2EBB59480093DBF2 /* Constants.swift in Sources */,
@@ -640,6 +655,7 @@
 				8E62A7F62EBBB9D70093DBF2 /* BorderedButton.swift in Sources */,
 				8E62A7E02EBBB4950093DBF2 /* BrowserFavoriteService.swift in Sources */,
 				8E62A7CB2EBBB1790093DBF2 /* FavoritesView.swift in Sources */,
+				8E2D70CA2EBCD82200534BEA /* ApiEndpoint.swift in Sources */,
 				8E62A7B92EBBB1780093DBF2 /* GestureObserver.swift in Sources */,
 				8E62A70D2EBB59480093DBF2 /* Fonts.swift in Sources */,
 				8E62A6FF2EBB59480093DBF2 /* Screen.swift in Sources */,

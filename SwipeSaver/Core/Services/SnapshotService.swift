@@ -1,6 +1,6 @@
 //
 //  SnapshotService.swift
-//  UntraX
+//  SwipeSaver
 //
 //  Created by AI Assistant on 29.10.2025.
 //

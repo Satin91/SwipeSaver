@@ -1,6 +1,6 @@
 //
 //  Fonts.swift
-//  UntraX
+//  SwipeSaver
 //
 //  Created by Артур Кулик on 23.10.2025.
 //  Copyright © 2025 ___ORGANIZATIONNAME___. All rights reserved.

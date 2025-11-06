@@ -1,6 +1,6 @@
 //
 //  QRDetector.swift
-//  UntraX
+//  SwipeSaver
 //
 //  Created by AI Assistant on 24.10.2024.
 //
@@ -71,7 +71,7 @@ final class QRDetector: NSObject, ObservableObject {
     private var resetTimer: Timer?
     private let resetDelay: TimeInterval = 0.5 // Сбрасываем через 0.5 секунды
     weak var previewLayer: AVCaptureVideoPreviewLayer?
-    private let queue = DispatchQueue(label: "com.untraxdev.cameraQueue")
+    private let queue = DispatchQueue(label: "com.swipesaver.cameraQueue")
     
     
     /// Подключает детектор к существующей AVCaptureSession

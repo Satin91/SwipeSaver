@@ -1,6 +1,6 @@
 //
 //  DividerView.swift
-//  UntraX
+//  SwipeSaver
 //
 //  Created by Артур Кулик.
 //

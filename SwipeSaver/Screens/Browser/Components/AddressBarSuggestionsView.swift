@@ -1,6 +1,6 @@
 //
 //  AddressBarSuggestionsView.swift
-//  UntraX
+//  SwipeSaver
 //
 //  Created by AI Assistant on 27.10.2025.
 //

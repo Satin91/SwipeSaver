@@ -17,11 +17,13 @@ class DIContainer {
     let videoSaverService: VideoSaverService
     let fileManagerService: FileManagerService
     let userDefaultsObserver: UserDefaultsObserver
+    let networkService: NetworkService
     // MARK: - Repositories
     let videoSaverRepository: VideoSaverRepository
     let fileManagerRepository: FileManagerRepository
     let webViewRepository: WebViewRepository
     let browserTabsRepository: BrowserTabsRepository
+    let networkRepository: NetworkRepository
     
     // MARK: - Interactors
     let appInteractor: AppInteractor
@@ -38,6 +40,7 @@ class DIContainer {
         self.videoSaverService = VideoSaverService.shared
         self.fileManagerService = FileManagerService.shared
         self.browserFavoriteService = .init(userDefaultsService: userDefaultsService)
+        self.networkService = NetworkService.shared
         userDefaultsObserver = UserDefaultsObserver(appSettings: appSettings)
         // Загрузка настроек
         
@@ -46,12 +49,13 @@ class DIContainer {
         self.fileManagerRepository = FileManagerRepository(fileManagerService: fileManagerService, directoryName: "SavedVideos")
         self.webViewRepository = WebViewRepository(favoritesService: browserFavoriteService, userDefaultsObserver: userDefaultsObserver)
         self.browserTabsRepository = BrowserTabsRepository(userDefaultsService: userDefaultsService)
+        self.networkRepository = NetworkRepository(networkService: networkService)
         
         // Инициализация интеракторов
         self.appInteractor = AppInteractor(appSettings: appSettings)
         self.videoSaverInteractor = VideoSaverInteractor(
             videoSaverRepository: videoSaverRepository,
-            fileManagerRepository: fileManagerRepository
+            fileManagerRepository: fileManagerRepository, networkRepository: networkRepository
         )
         self.webViewInteractor = WebViewInteractor(webViewRepository: webViewRepository, browserTabsRepository: browserTabsRepository)
     }

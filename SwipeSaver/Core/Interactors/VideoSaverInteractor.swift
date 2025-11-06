@@ -13,30 +13,48 @@ import Combine
 final class VideoSaverInteractor: ObservableObject {
     
     // MARK: - Published Properties
-    @Published var savedVideos: [SavedVideo] = []
     @Published var isDownloading: Bool = false
     @Published var downloadProgress: Double = 0.0
     @Published var errorMessage: String?
     
     // MARK: - Private Properties
     private let videoSaverRepository: VideoSaverRepository
+    private let networkRepository: NetworkRepository
     private let fileManagerRepository: FileManagerRepository
     private var cancellables = Set<AnyCancellable>()
     
+    // MARK: - Computed Properties
+    
+    /// Список сохраненных видео (из repository)
+    var savedVideos: [SavedVideo] {
+        return fileManagerRepository.savedVideos
+    }
+    
     // MARK: - Initialization
-    init(videoSaverRepository: VideoSaverRepository, fileManagerRepository: FileManagerRepository) {
+    init(videoSaverRepository: VideoSaverRepository, fileManagerRepository: FileManagerRepository, networkRepository: NetworkRepository) {
         self.videoSaverRepository = videoSaverRepository
+        self.networkRepository = networkRepository
         self.fileManagerRepository = fileManagerRepository
         setupSubscriptions()
-        loadSavedVideos()
     }
     
     // MARK: - Public Methods
     
+    /// Универсальный метод для загрузки видео (автоматически определяет тип ссылки)
+    /// - Parameter urlString: URL видео
+    @MainActor
+    func downloadVideo(from urlString: String) async {
+        if isDirectVideoURL(urlString) {
+            await downloadAndSaveVideo(from: urlString)
+        } else {
+            await downloadSocialVideo(from: urlString)
+        }
+    }
+    
     /// Скачать и сохранить видео
     /// - Parameter urlString: URL видео
     @MainActor
-    func downloadAndSaveVideo(from urlString: String) async {
+    private func downloadAndSaveVideo(from urlString: String) async {
         isDownloading = true
         errorMessage = nil
         
@@ -48,15 +66,55 @@ final class VideoSaverInteractor: ObservableObject {
         }
     }
     
+    /// Скачать и сохранить видео из соц. сети
+    /// - Parameter urlString: URL видео
+    @MainActor
+    private func downloadSocialVideo(from urlString: String) async {
+        isDownloading = true
+        errorMessage = nil
+        
+        do {
+            // 1. Получаем информацию о видео через API
+            let response: SocialVideoResponse = try await networkRepository.request(
+                .fetchSocialVideo(url: urlString)
+            )
+            
+            guard response.isSuccess else {
+                throw VideoDownloadError.downloadFailed(response.errorMessage ?? "Не удалось получить видео")
+            }
+            
+            // 2. Выбираем видео для загрузки
+            guard let videoToDownload = response.videoWithAudio ?? response.bestMP4Video ?? response.bestQualityVideo else {
+                throw VideoDownloadError.downloadFailed("Видео не найдено")
+            }
+            
+            print("📥 Загружаем: \(videoToDownload.formatDescription)")
+            
+            // 3. Загружаем видео
+            let videoData = try await videoSaverRepository.downloadDirectVideo(from: videoToDownload.url)
+            
+            // 4. Сохраняем через repository (автоматически добавит в список)
+            try fileManagerRepository.saveVideoAndCreateModel(
+                data: videoData,
+                title: response.title,
+                platform: "Social",
+                quality: videoToDownload.qualityDescription,
+                extension: videoToDownload.ext ?? "mp4"
+            )
+            
+            isDownloading = false
+            
+        } catch {
+            print("❌ Ошибка: \(error)")
+            handleDownloadError(error)
+        }
+    }
+    
     /// Удалить сохраненное видео
     /// - Parameter video: Видео для удаления
     func deleteSavedVideo(_ video: SavedVideo) {
         do {
-            try fileManagerRepository.deleteFile(at: video.fileURL)
-            
-            // Удаляем из списка
-            savedVideos.removeAll { $0.id == video.id }
-            
+            try fileManagerRepository.deleteSavedVideo(video)
         } catch {
             print("❌ Ошибка удаления видео: \(error.localizedDescription)")
             errorMessage = "Не удалось удалить видео"
@@ -64,21 +122,34 @@ final class VideoSaverInteractor: ObservableObject {
     }
     
     /// Получить размер всех сохраненных видео
-    /// - Returns: Размер в байтах
     func getTotalSize() -> Int64 {
         return fileManagerRepository.totalSize
     }
     
     /// Получить отформатированный размер
-    /// - Returns: Строка с размером (например "125.5 MB")
     func getFormattedTotalSize() -> String {
         return fileManagerRepository.formattedTotalSize
     }
     
     /// Очистить все сохраненные видео
     func clearAllVideos() {
-        fileManagerRepository.deleteAllFiles()
-        savedVideos.removeAll()
+        fileManagerRepository.clearAllSavedVideos()
+    }
+    
+    /// Определяет, является ли URL прямой ссылкой на видео файл
+    /// - Parameter urlString: URL для проверки
+    /// - Returns: true, если это прямая ссылка на видео, false - если это ссылка на соц. сеть
+    func isDirectVideoURL(_ urlString: String) -> Bool {
+        guard let url = URL(string: urlString) else {
+            return false
+        }
+        
+        // Список поддерживаемых видео расширений
+        let videoExtensions = ["mp4", "mov", "avi", "mkv", "m4v", "mpg", "mpeg", "wmv", "flv", "webm", "3gp"]
+        
+        // Если URL заканчивается на видео расширение - это Direct, иначе - Social
+        let pathExtension = url.pathExtension.lowercased()
+        return videoExtensions.contains(pathExtension)
     }
     
     // MARK: - Private Methods
@@ -129,58 +200,13 @@ final class VideoSaverInteractor: ObservableObject {
     /// Сохранить видео в файловую систему
     @MainActor
     private func saveVideoToFile(result: VideoDownloadResult, data: Data) async {
-        // Генерируем имя файла
-        let fileName = generateFileName(for: result)
-        
         do {
-            // Сохраняем файл через FileManagerRepository
-            let fileURL = try fileManagerRepository.saveFile(data: data, fileName: fileName)
-            
-            // Создаем модель сохраненного видео
-            let savedVideo = SavedVideo(
-                id: result.id,
-                fileName: fileName,
-                fileURL: fileURL,
-                platform: result.platform.rawValue,
-                title: result.title,
-                dateAdded: Date(),
-                fileSize: Int64(data.count)
-            )
-            
-            // Добавляем в список
-            savedVideos.insert(savedVideo, at: 0)
-            
+            // Сохраняем через repository (автоматически добавит в список)
+            try fileManagerRepository.saveVideoFromDownloadResult(data: data, result: result)
             isDownloading = false
-            
-            print("✅ Видео сохранено: \(fileName)")
-            
         } catch {
             handleDownloadError(VideoDownloadError.downloadFailed("Не удалось сохранить файл: \(error.localizedDescription)"))
         }
-    }
-    
-    /// Генерировать имя файла для видео
-    private func generateFileName(for result: VideoDownloadResult) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-        let timestamp = dateFormatter.string(from: Date())
-        
-        let platform = result.platform.rawValue.lowercased()
-        return "\(platform)_\(timestamp).mp4"
-    }
-    
-    /// Загрузить список сохраненных видео
-    private func loadSavedVideos() {
-        // Получаем файлы из FileManagerRepository
-        let videoFiles = fileManagerRepository.getFiles(withExtensions: ["mp4"])
-        
-        // Конвертируем FileInfo в SavedVideo
-        savedVideos = videoFiles.map { fileInfo in
-            let platform = VideoPlatform.extractFromFileName(fileInfo.fileName)
-            return SavedVideo(from: fileInfo, platform: platform)
-        }
-        
-        print("📁 Загружено сохраненных видео: \(savedVideos.count)")
     }
 }
 

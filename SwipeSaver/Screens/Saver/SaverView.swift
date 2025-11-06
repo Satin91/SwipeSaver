@@ -19,7 +19,8 @@ final class SaverViewModel: ObservableObject {
     func uploadVideo() {
         guard !urlText.isEmpty else { return }
         Task { @MainActor in
-            await videoSaverInteractor.downloadAndSaveVideo(from: urlText)
+//            await videoSaverInteractor.downloadSocialVideo(from: urlText)
+            await videoSaverInteractor.downloadVideo(from: urlText)
         }
     }
 }

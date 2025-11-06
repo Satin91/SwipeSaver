@@ -1,6 +1,6 @@
 //
 //  AsyncImageLoader.swift
-//  UntraX
+//  SwipeSaver
 //
 //  Created by Артур Кулик on 27.10.2025.
 //

@@ -3,4 +3,129 @@
    uuid = "B2CE64EC-4CF7-40FC-81BD-3EC2F8A5A0C9"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "988F8170-D287-43BC-95DF-2FBD379C926B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwipeSaver/Core/Services/NetworkService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "280"
+            endingLineNumber = "280"
+            landmarkName = "request(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "988F8170-D287-43BC-95DF-2FBD379C926B - 6c0e09d567421375"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for SwipeSaver.NetworkService.request&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable&gt;(SwipeSaver.APIEndpoint) async throws -&gt; &#x3c4;_0_0"
+                  moduleName = "SwipeSaver"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arthur/Xcode/Nikolas/SwipeSaver/SwipeSaver/Core/Services/NetworkService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "280"
+                  endingLineNumber = "280"
+                  offsetFromSymbolStart = "188">
+               </Location>
+               <Location
+                  uuid = "988F8170-D287-43BC-95DF-2FBD379C926B - a4c8a6377c39217a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for SwipeSaver.NetworkService.request&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable&gt;(SwipeSaver.APIEndpoint) async throws -&gt; &#x3c4;_0_0"
+                  moduleName = "SwipeSaver"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arthur/Xcode/Nikolas/SwipeSaver/SwipeSaver/Core/Services/NetworkService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "313"
+                  endingLineNumber = "313"
+                  offsetFromSymbolStart = "24">
+               </Location>
+               <Location
+                  uuid = "988F8170-D287-43BC-95DF-2FBD379C926B - a4c8a6377c392dbd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for SwipeSaver.NetworkService.request&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable&gt;(SwipeSaver.APIEndpoint) async throws -&gt; &#x3c4;_0_0"
+                  moduleName = "SwipeSaver"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arthur/Xcode/Nikolas/SwipeSaver/SwipeSaver/Core/Services/NetworkService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "280"
+                  endingLineNumber = "280"
+                  offsetFromSymbolStart = "68">
+               </Location>
+               <Location
+                  uuid = "988F8170-D287-43BC-95DF-2FBD379C926B - a3285bd0f17cd3b0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for SwipeSaver.NetworkService.request&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable&gt;(SwipeSaver.APIEndpoint) async throws -&gt; &#x3c4;_0_0"
+                  moduleName = "SwipeSaver"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arthur/Xcode/Nikolas/SwipeSaver/SwipeSaver/Core/Services/NetworkService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "313"
+                  endingLineNumber = "313"
+                  offsetFromSymbolStart = "84">
+               </Location>
+               <Location
+                  uuid = "988F8170-D287-43BC-95DF-2FBD379C926B - a3285bd0f17cdf77"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for SwipeSaver.NetworkService.request&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable&gt;(SwipeSaver.APIEndpoint) async throws -&gt; &#x3c4;_0_0"
+                  moduleName = "SwipeSaver"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arthur/Xcode/Nikolas/SwipeSaver/SwipeSaver/Core/Services/NetworkService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "280"
+                  endingLineNumber = "280"
+                  offsetFromSymbolStart = "396">
+               </Location>
+               <Location
+                  uuid = "988F8170-D287-43BC-95DF-2FBD379C926B - 40a7bcce440831bf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for SwipeSaver.NetworkService.request&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable&gt;(SwipeSaver.APIEndpoint) async throws -&gt; &#x3c4;_0_0"
+                  moduleName = "SwipeSaver"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arthur/Xcode/Nikolas/SwipeSaver/SwipeSaver/Core/Services/NetworkService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "313"
+                  endingLineNumber = "313"
+                  offsetFromSymbolStart = "24">
+               </Location>
+               <Location
+                  uuid = "988F8170-D287-43BC-95DF-2FBD379C926B - 40a7bcce44083d78"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for SwipeSaver.NetworkService.request&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable&gt;(SwipeSaver.APIEndpoint) async throws -&gt; &#x3c4;_0_0"
+                  moduleName = "SwipeSaver"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arthur/Xcode/Nikolas/SwipeSaver/SwipeSaver/Core/Services/NetworkService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "280"
+                  endingLineNumber = "280"
+                  offsetFromSymbolStart = "80">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

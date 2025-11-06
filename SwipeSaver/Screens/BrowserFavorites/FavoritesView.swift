@@ -1,6 +1,6 @@
 //
 //  BrowserFavoritesView.swift
-//  UntraX
+//  SwipeSaver
 //
 //  Created by Артур Кулик on 28.10.2025.
 //

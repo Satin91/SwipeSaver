@@ -9,6 +9,38 @@
 import Foundation
 import Combine
 
+/// Delegate для отслеживания прогресса загрузки
+private class DownloadProgressDelegate: NSObject, URLSessionDownloadDelegate {
+    let progressHandler: (Double) -> Void
+    let completion: (Result<Data, Error>) -> Void
+    
+    init(progressHandler: @escaping (Double) -> Void, completion: @escaping (Result<Data, Error>) -> Void) {
+        self.progressHandler = progressHandler
+        self.completion = completion
+    }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        do {
+            let data = try Data(contentsOf: location)
+            completion(.success(data))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        guard totalBytesExpectedToWrite > 0 else { return }
+        let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+        progressHandler(progress)
+    }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if let error = error {
+            completion(.failure(error))
+        }
+    }
+}
+
 /// Репозиторий для управления загрузкой видео
 final class VideoSaverRepository: ObservableObject {
     
@@ -48,11 +80,21 @@ final class VideoSaverRepository: ObservableObject {
         // Запускаем загрузку с отслеживанием прогресса
         do {
             let result = try await videoSaverService.downloadVideo(from: url) { [weak self] progress in
-                self?.currentProgress = progress
+                print("DEBUG: progress \(progress)")
+                Task { @MainActor in
+                    self?.currentProgress = progress
+                }
             }
             handleDownloadUpdate(result)
+            
+            // Сбрасываем прогресс после завершения
+            currentProgress = 0.0
+            
             return result
         } catch {
+            // Сбрасываем прогресс при ошибке
+            currentProgress = 0.0
+            
             if let downloadError = error as? VideoDownloadError {
                 throw downloadError
             }
@@ -93,6 +135,40 @@ final class VideoSaverRepository: ObservableObject {
     @MainActor
     func clearCompletedDownloads() {
         completedDownloads.removeAll()
+    }
+    
+    /// Загрузить видео по прямой ссылке (для соц. сетей)
+    /// - Parameters:
+    ///   - urlString: Прямая ссылка на видео
+    /// - Returns: Данные видео
+    @MainActor
+    func downloadDirectVideo(from urlString: String) async throws -> Data {
+        guard let url = URL(string: urlString) else {
+            throw VideoDownloadError.invalidURL
+        }
+        
+        print("📥 Загрузка видео: \(urlString)")
+        
+        // Используем делегат для отслеживания прогресса
+        let data = try await withCheckedThrowingContinuation { continuation in
+            let delegate = DownloadProgressDelegate(progressHandler: { [weak self] progress in
+                Task { @MainActor in
+                    self?.currentProgress = progress
+                }
+            }, completion: { result in
+                continuation.resume(with: result)
+            })
+            
+            let config = URLSessionConfiguration.default
+            let session = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
+            let task = session.downloadTask(with: url)
+            task.resume()
+        }
+        
+        // Сбрасываем прогресс после завершения
+        currentProgress = 0.0
+        
+        return data
     }
     
     // MARK: - Private Methods

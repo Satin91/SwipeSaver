@@ -1,8 +1,8 @@
 //
 //  CustomTextField.swift
-//  UntraX
+//  SwipeSaver
 //
-//  Created by UntraX team on 29.10.2025.
+//  Created by Артур Кулик on 05.11.2025.
 //
 
 import SwiftUI

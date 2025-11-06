@@ -16,6 +16,7 @@ final class FileManagerRepository: ObservableObject {
     @Published var files: [FileInfo] = []
     @Published var totalSize: Int64 = 0
     @Published var availableDiskSpace: Int64 = 0
+    @Published var savedVideos: [SavedVideo] = []
     
     // MARK: - Private Properties
     private let fileManagerService: FileManagerService
@@ -49,6 +50,7 @@ final class FileManagerRepository: ObservableObject {
         // Загружаем начальные данные
         loadFiles()
         updateDiskSpace()
+        loadSavedVideos()
     }
     
     // MARK: - Public Methods
@@ -150,6 +152,154 @@ final class FileManagerRepository: ObservableObject {
     /// Получить URL рабочей директории
     var directoryURL: URL {
         return workingDirectory
+    }
+    
+    // MARK: - SavedVideo Methods
+    
+    /// Сохранить видео и создать модель SavedVideo
+    /// - Parameters:
+    ///   - data: Данные видео
+    ///   - title: Название видео
+    ///   - platform: Платформа (YouTube, TikTok, Social, etc.)
+    ///   - quality: Качество видео
+    ///   - extension: Расширение файла
+    /// - Returns: Модель SavedVideo
+    @discardableResult
+    func saveVideoAndCreateModel(
+        data: Data,
+        title: String?,
+        platform: String,
+        quality: String? = nil,
+        extension ext: String = "mp4"
+    ) throws -> SavedVideo {
+        // Генерируем имя файла
+        let fileName = generateVideoFileName(
+            title: title,
+            platform: platform,
+            quality: quality,
+            extension: ext
+        )
+        
+        // Сохраняем файл
+        let fileURL = try saveFile(data: data, fileName: fileName)
+        
+        // Создаем модель
+        let savedVideo = SavedVideo(
+            id: UUID(),
+            fileName: fileName,
+            fileURL: fileURL,
+            platform: platform,
+            title: title ?? "Untitled",
+            dateAdded: Date(),
+            fileSize: Int64(data.count)
+        )
+        
+        // Добавляем в список сохраненных видео
+        savedVideos.insert(savedVideo, at: 0)
+        
+        print("✅ Видео сохранено: \(fileName)")
+        
+        return savedVideo
+    }
+    
+    /// Сохранить видео из результата загрузки
+    /// - Parameters:
+    ///   - data: Данные видео
+    ///   - result: Результат загрузки
+    /// - Returns: Модель SavedVideo
+    @discardableResult
+    func saveVideoFromDownloadResult(
+        data: Data,
+        result: VideoDownloadResult
+    ) throws -> SavedVideo {
+        // Генерируем имя файла
+        let fileName = generateVideoFileName(
+            title: result.title,
+            platform: result.platform.rawValue,
+            quality: nil,
+            extension: "mp4"
+        )
+        
+        // Сохраняем файл
+        let fileURL = try saveFile(data: data, fileName: fileName)
+        
+        // Создаем модель
+        let savedVideo = SavedVideo(
+            id: result.id,
+            fileName: fileName,
+            fileURL: fileURL,
+            platform: result.platform.rawValue,
+            title: result.title,
+            dateAdded: Date(),
+            fileSize: Int64(data.count)
+        )
+        
+        // Добавляем в список сохраненных видео
+        savedVideos.insert(savedVideo, at: 0)
+        
+        print("✅ Видео сохранено: \(fileName)")
+        
+        return savedVideo
+    }
+    
+    /// Удалить сохраненное видео
+    /// - Parameter video: Видео для удаления
+    func deleteSavedVideo(_ video: SavedVideo) throws {
+        // Удаляем файл
+        try deleteFile(at: video.fileURL)
+        
+        // Удаляем из списка
+        savedVideos.removeAll { $0.id == video.id }
+        
+        print("🗑️ Видео удалено: \(video.fileName)")
+    }
+    
+    /// Очистить все сохраненные видео
+    func clearAllSavedVideos() {
+        deleteAllFiles()
+        savedVideos.removeAll()
+        print("🗑️ Все видео удалены")
+    }
+    
+    /// Загрузить сохраненные видео (приватный метод для инициализации)
+    private func loadSavedVideos() {
+        let videoFiles = getFiles(withExtensions: ["mp4", "mov", "avi"])
+        
+        savedVideos = videoFiles.map { fileInfo in
+            let platform = VideoPlatform.extractFromFileName(fileInfo.fileName)
+            return SavedVideo(from: fileInfo, platform: platform)
+        }
+        
+        print("📁 Загружено сохраненных видео: \(savedVideos.count)")
+    }
+    
+    /// Обновить список сохраненных видео
+    func refreshSavedVideos() {
+        loadSavedVideos()
+    }
+    
+    /// Генерировать имя файла для видео
+    /// - Parameters:
+    ///   - title: Название видео
+    ///   - platform: Платформа
+    ///   - quality: Качество
+    ///   - extension: Расширение файла
+    /// - Returns: Имя файла
+    private func generateVideoFileName(
+        title: String?,
+        platform: String,
+        quality: String?,
+        extension ext: String
+    ) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        let timestamp = dateFormatter.string(from: Date())
+        
+        let platformTag = platform.lowercased()
+        let qualityTag = quality.map { "_\($0.replacingOccurrences(of: " ", with: "_"))" } ?? ""
+        let titleTag = title.map { "_\($0)" } ?? ""
+        
+        return "\(platformTag)\(titleTag)\(qualityTag)_\(timestamp).\(ext)"
     }
     
     // MARK: - Private Methods
