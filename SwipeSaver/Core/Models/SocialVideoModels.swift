@@ -17,7 +17,7 @@ struct SocialVideoResponse: Codable {
     let status: Int?
     let timeEnd: Int?
     let author: String?
-    let duration: Int?
+    let duration: Double?
     let medias: [SocialMediaItem]?
     let thumbnail: String?
     let title: String?
@@ -35,7 +35,7 @@ struct SocialMediaItem: Codable {
     let audioQuality: String?
     let audioSampleRate: String?
     let bitrate: Int?
-    let duration: Int?
+    let duration: Double?
     let ext: String?
     let `extension`: String?
     let formatId: Int?
@@ -149,8 +149,9 @@ extension SocialVideoResponse {
     /// Форматированное описание продолжительности
     var durationFormatted: String {
         guard let duration = duration else { return "Unknown" }
-        let minutes = duration / 60
-        let seconds = duration % 60
+        let totalSeconds = Int(duration)
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
         return String(format: "%d:%02d", minutes, seconds)
     }
 }

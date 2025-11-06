@@ -44,66 +44,57 @@ final class VideoSaverInteractor: ObservableObject {
     /// - Parameter urlString: URL видео
     @MainActor
     func downloadVideo(from urlString: String) async {
-        if isDirectVideoURL(urlString) {
-            await downloadAndSaveVideo(from: urlString)
-        } else {
-            await downloadSocialVideo(from: urlString)
-        }
-    }
-    
-    /// Скачать и сохранить видео
-    /// - Parameter urlString: URL видео
-    @MainActor
-    private func downloadAndSaveVideo(from urlString: String) async {
         isDownloading = true
         errorMessage = nil
         
         do {
-            let downloadResult = try await videoSaverRepository.startDownload(from: urlString)
-            await handleDownloadSuccess(downloadResult)
-        } catch {
-            handleDownloadError(error)
-        }
-    }
-    
-    /// Скачать и сохранить видео из соц. сети
-    /// - Parameter urlString: URL видео
-    @MainActor
-    private func downloadSocialVideo(from urlString: String) async {
-        isDownloading = true
-        errorMessage = nil
-        
-        do {
-            // 1. Получаем информацию о видео через API
-            let response: SocialVideoResponse = try await networkRepository.request(
-                .fetchSocialVideo(url: urlString)
-            )
-            
-            guard response.isSuccess else {
-                throw VideoDownloadError.downloadFailed(response.errorMessage ?? "Не удалось получить видео")
+            if isDirectVideoURL(urlString) {
+                // Прямая ссылка - загружаем напрямую
+                let videoData = try await videoSaverRepository.downloadVideo(from: urlString)
+                
+                // Сохраняем через repository
+                try fileManagerRepository.saveVideoAndCreateModel(
+                    data: videoData,
+                    title: "Direct Video",
+                    platform: "Direct",
+                    quality: nil,
+                    extension: "mp4"
+                )
+                
+                isDownloading = false
+            } else {
+                // Соц. сеть - получаем информацию через API
+                let response: SocialVideoResponse = try await networkRepository.request(
+                    .fetchSocialVideo(url: urlString)
+                )
+                
+                guard response.isSuccess else {
+                    throw VideoDownloadError.downloadFailed(response.errorMessage ?? "Не удалось получить видео")
+                }
+                
+                guard let videoToDownload = response.videoWithAudio ?? response.bestMP4Video ?? response.bestQualityVideo else {
+                    throw VideoDownloadError.downloadFailed("Видео не найдено")
+                }
+                
+                print("📥 Загружаем: \(videoToDownload.formatDescription)")
+                
+                // Определяем платформу из оригинальной ссылки
+                let platform = detectPlatform(from: urlString)
+                
+                // Загружаем видео
+                let videoData = try await videoSaverRepository.downloadDirectVideo(from: videoToDownload.url)
+                
+                // Сохраняем через repository с правильной платформой
+                try fileManagerRepository.saveVideoAndCreateModel(
+                    data: videoData,
+                    title: response.title,
+                    platform: platform.rawValue,
+                    quality: videoToDownload.qualityDescription,
+                    extension: videoToDownload.ext ?? "mp4"
+                )
+                
+                isDownloading = false
             }
-            
-            // 2. Выбираем видео для загрузки
-            guard let videoToDownload = response.videoWithAudio ?? response.bestMP4Video ?? response.bestQualityVideo else {
-                throw VideoDownloadError.downloadFailed("Видео не найдено")
-            }
-            
-            print("📥 Загружаем: \(videoToDownload.formatDescription)")
-            
-            // 3. Загружаем видео
-            let videoData = try await videoSaverRepository.downloadDirectVideo(from: videoToDownload.url)
-            
-            // 4. Сохраняем через repository (автоматически добавит в список)
-            try fileManagerRepository.saveVideoAndCreateModel(
-                data: videoData,
-                title: response.title,
-                platform: "Social",
-                quality: videoToDownload.qualityDescription,
-                extension: videoToDownload.ext ?? "mp4"
-            )
-            
-            isDownloading = false
-            
         } catch {
             print("❌ Ошибка: \(error)")
             handleDownloadError(error)
@@ -144,12 +135,50 @@ final class VideoSaverInteractor: ObservableObject {
             return false
         }
         
-        // Список поддерживаемых видео расширений
-        let videoExtensions = ["mp4", "mov", "avi", "mkv", "m4v", "mpg", "mpeg", "wmv", "flv", "webm", "3gp"]
+        let host = url.host?.lowercased() ?? ""
         
-        // Если URL заканчивается на видео расширение - это Direct, иначе - Social
-        let pathExtension = url.pathExtension.lowercased()
-        return videoExtensions.contains(pathExtension)
+        // Список доменов социальных сетей
+        let socialDomains = [
+            "youtube.com", "youtu.be",
+            "tiktok.com", "vt.tiktok.com",
+            "instagram.com",
+            "twitter.com", "x.com", "t.co",
+            "facebook.com", "fb.watch", "fb.com",
+            "vk.com", "vk.ru",
+            "ok.ru", "odnoklassniki.ru",
+            "rutube.ru",
+            "twitch.tv",
+            "reddit.com", "redd.it",
+            "pinterest.com", "pin.it",
+            "linkedin.com",
+            "snapchat.com",
+            "vimeo.com",
+            "dailymotion.com", "dai.ly",
+            "bilibili.com", "b23.tv",
+            "t.me", "telegram.org"
+        ]
+        
+        // Если это ссылка на соц. сеть - точно не прямая ссылка
+        for domain in socialDomains {
+            if host.contains(domain) {
+                return false
+            }
+        }
+        
+        // Если это НЕ соц. сеть - считаем прямой ссылкой
+        // (даже если нет расширения, это может быть прямая ссылка от CDN)
+        return true
+    }
+    
+    /// Определить платформу из URL
+    /// - Parameter urlString: URL для проверки
+    /// - Returns: Платформа
+    private func detectPlatform(from urlString: String) -> VideoPlatform {
+        guard let url = URL(string: urlString) else {
+            return .direct
+        }
+        
+        return VideoPlatform.detect(from: url) ?? .direct
     }
     
     // MARK: - Private Methods
@@ -171,19 +200,6 @@ final class VideoSaverInteractor: ObservableObject {
             .store(in: &cancellables)
     }
     
-    /// Обработать успешную загрузку
-    @MainActor
-    private func handleDownloadSuccess(_ result: VideoDownloadResult) async {
-        guard result.status == .completed,
-              let videoData = result.videoData else {
-            isDownloading = false
-            return
-        }
-        
-        // Сохраняем файл
-        await saveVideoToFile(result: result, data: videoData)
-    }
-    
     /// Обработать ошибку загрузки
     private func handleDownloadError(_ error: Error) {
         isDownloading = false
@@ -195,18 +211,6 @@ final class VideoSaverInteractor: ObservableObject {
         }
         
         print("❌ Ошибка загрузки: \(errorMessage ?? "Неизвестная ошибка")")
-    }
-    
-    /// Сохранить видео в файловую систему
-    @MainActor
-    private func saveVideoToFile(result: VideoDownloadResult, data: Data) async {
-        do {
-            // Сохраняем через repository (автоматически добавит в список)
-            try fileManagerRepository.saveVideoFromDownloadResult(data: data, result: result)
-            isDownloading = false
-        } catch {
-            handleDownloadError(VideoDownloadError.downloadFailed("Не удалось сохранить файл: \(error.localizedDescription)"))
-        }
     }
 }
 
