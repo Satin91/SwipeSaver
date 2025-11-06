@@ -30,42 +30,32 @@ struct SaverView: View {
     @ObservedObject private var interactor = Executor.videoSaverInteractor
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.tm.background
-                    .ignoresSafeArea()
-                
-                VStack(spacing: .medium) {
-                    // Header с информацией
-                    headerView
-                    
-                    // Поле ввода URL
-                    urlInputSection
-                    
-                    // Кнопка загрузки
-                    downloadButton
-                    
-                    // Прогресс загрузки
-                    if interactor.isDownloading {
-                        progressView
-                    }
-                    
-                    // Ошибка
-                    if let errorMessage = interactor.errorMessage {
-                        errorView(message: errorMessage)
-                    }
-                    
-                    // Список сохраненных видео
-                    savedVideosSection
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, .medium)
-                .padding(.top, .medium)
+        VStack(spacing: .medium) {
+            // Header с информацией
+            headerView
+            
+            // Поле ввода URL
+            urlInputSection
+            
+            // Кнопка загрузки
+            downloadButton
+            
+            // Прогресс загрузки
+            if interactor.isDownloading {
+                progressView
             }
-            .navigationTitle("Загрузка видео")
-            .navigationBarTitleDisplayMode(.large)
+            
+            // Ошибка
+            if let errorMessage = interactor.errorMessage {
+                errorView(message: errorMessage)
+            }
+            
+            // Список сохраненных видео
+            savedVideosSection
         }
+        .padding(.horizontal, .medium)
+        .padding(.top, .medium)
+        .background(Color.tm.background.ignoresSafeArea())
     }
     
     // MARK: - Header
@@ -282,102 +272,6 @@ struct SaverView: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Video Row
-
-struct VideoRow: View {
-    let video: SavedVideo
-    let onDelete: () -> Void
-    
-    var body: some View {
-        HStack(spacing: .medium) {
-            // Иконка платформы
-            platformIcon(video.platform)
-            
-            // Информация о видео
-            VStack(alignment: .leading, spacing: .smallExt) {
-                Text(video.fileName)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.tm.title)
-                    .lineLimit(1)
-                
-                HStack(spacing: .regular) {
-                    Text(video.platform)
-                        .font(.caption)
-                        .foregroundColor(.tm.accent)
-                    
-                    Text("•")
-                        .foregroundColor(.tm.subTitle)
-                    
-                    Text(formatFileSize(video.fileSize))
-                        .font(.caption)
-                        .foregroundColor(.tm.subTitle)
-                    
-                    Text("•")
-                        .foregroundColor(.tm.subTitle)
-                    
-                    Text(formatDate(video.dateAdded))
-                        .font(.caption)
-                        .foregroundColor(.tm.subTitle)
-                }
-            }
-            
-            Spacer()
-            
-            // Кнопка удаления
-            Button(action: onDelete) {
-                Image(systemName: "trash")
-                    .foregroundColor(.tm.error)
-                    .font(.system(size: 18))
-            }
-        }
-        .padding(.medium)
-        .background(Color.tm.container)
-        .cornerRadius(Layout.Radius.regular)
-    }
-    
-    @ViewBuilder
-    private func platformIcon(_ platform: String) -> some View {
-        var iconName: String = ""
-        let iconColor: Color
-        
-        switch platform.lowercased() {
-        case "youtube":
-            iconName = "play.rectangle.fill"
-            iconColor = .red
-        case "tiktok":
-            iconName = "music.note"
-            iconColor = .tm.accent
-        case "instagram":
-            iconName = "camera.fill"
-            iconColor = .purple
-        case "direct":
-            iconName = "link.circle.fill"
-            iconColor = .blue
-        default:
-            iconName = "film"
-            iconColor = .tm.subTitle
-        }
-        
-        return Image(systemName: iconName)
-            .font(.system(size: 24))
-            .foregroundColor(iconColor)
-            .frame(width: 44, height: 44)
-            .background(iconColor.opacity(0.1))
-            .cornerRadius(Layout.Radius.regular)
-    }
-    
-    private func formatFileSize(_ bytes: Int64) -> String {
-        return ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
-    }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy"
-        return formatter.string(from: date)
     }
 }
 

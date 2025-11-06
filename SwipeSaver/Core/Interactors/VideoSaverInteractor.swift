@@ -53,7 +53,7 @@ final class VideoSaverInteractor: ObservableObject {
                 let videoData = try await videoSaverRepository.downloadVideo(from: urlString)
                 
                 // Сохраняем через repository
-                try fileManagerRepository.saveVideoAndCreateModel(
+                try await fileManagerRepository.saveVideoAndCreateModel(
                     data: videoData,
                     title: "Direct Video",
                     platform: "Direct",
@@ -85,7 +85,7 @@ final class VideoSaverInteractor: ObservableObject {
                 let videoData = try await videoSaverRepository.downloadDirectVideo(from: videoToDownload.url)
                 
                 // Сохраняем через repository с правильной платформой
-                try fileManagerRepository.saveVideoAndCreateModel(
+                try await fileManagerRepository.saveVideoAndCreateModel(
                     data: videoData,
                     title: response.title,
                     platform: platform.rawValue,

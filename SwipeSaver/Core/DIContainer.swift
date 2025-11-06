@@ -18,6 +18,7 @@ class DIContainer {
     let fileManagerService: FileManagerService
     let userDefaultsObserver: UserDefaultsObserver
     let networkService: NetworkService
+    let videoWatermarkService: VideoWatermarkService
     // MARK: - Repositories
     let videoSaverRepository: VideoSaverRepository
     let fileManagerRepository: FileManagerRepository
@@ -41,12 +42,17 @@ class DIContainer {
         self.fileManagerService = FileManagerService.shared
         self.browserFavoriteService = .init(userDefaultsService: userDefaultsService)
         self.networkService = NetworkService.shared
+        self.videoWatermarkService = VideoWatermarkService()
         userDefaultsObserver = UserDefaultsObserver(appSettings: appSettings)
         // Загрузка настроек
         
         // Инициализация репозиториев
         self.videoSaverRepository = VideoSaverRepository(videoSaverService: videoSaverService)
-        self.fileManagerRepository = FileManagerRepository(fileManagerService: fileManagerService, directoryName: "SavedVideos")
+        self.fileManagerRepository = FileManagerRepository(
+            fileManagerService: fileManagerService,
+            videoWatermarkService: videoWatermarkService,
+            directoryName: "SavedVideos"
+        )
         self.webViewRepository = WebViewRepository(favoritesService: browserFavoriteService, userDefaultsObserver: userDefaultsObserver)
         self.browserTabsRepository = BrowserTabsRepository(userDefaultsService: userDefaultsService)
         self.networkRepository = NetworkRepository(networkService: networkService)

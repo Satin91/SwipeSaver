@@ -11,6 +11,10 @@
 		8E2D70C72EBCD56500534BEA /* NetworkRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70C62EBCD56500534BEA /* NetworkRepository.swift */; };
 		8E2D70CA2EBCD82200534BEA /* ApiEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70C92EBCD82200534BEA /* ApiEndpoint.swift */; };
 		8E2D70CC2EBCDE8800534BEA /* SocialVideoModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70CB2EBCDE8800534BEA /* SocialVideoModels.swift */; };
+		8E2D70CF2EBD082F00534BEA /* UserFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70CE2EBD082F00534BEA /* UserFilesView.swift */; };
+		8E2D70D12EBD092D00534BEA /* VideoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70D02EBD092D00534BEA /* VideoRow.swift */; };
+		8E2D70D32EBD128F00534BEA /* VideoWatermarkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70D22EBD128F00534BEA /* VideoWatermarkService.swift */; };
+		8E2D70D52EBD14DA00534BEA /* TabBarOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D70D42EBD14DA00534BEA /* TabBarOverlay.swift */; };
 		8E62A6E92EBB59480093DBF2 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A6E82EBB59480093DBF2 /* DIContainer.swift */; };
 		8E62A6EB2EBB59480093DBF2 /* Executor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A6EA2EBB59480093DBF2 /* Executor.swift */; };
 		8E62A6ED2EBB59480093DBF2 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E62A6EC2EBB59480093DBF2 /* Constants.swift */; };
@@ -96,6 +100,10 @@
 		8E2D70C62EBCD56500534BEA /* NetworkRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkRepository.swift; sourceTree = "<group>"; };
 		8E2D70C92EBCD82200534BEA /* ApiEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiEndpoint.swift; sourceTree = "<group>"; };
 		8E2D70CB2EBCDE8800534BEA /* SocialVideoModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialVideoModels.swift; sourceTree = "<group>"; };
+		8E2D70CE2EBD082F00534BEA /* UserFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserFilesView.swift; sourceTree = "<group>"; };
+		8E2D70D02EBD092D00534BEA /* VideoRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoRow.swift; sourceTree = "<group>"; };
+		8E2D70D22EBD128F00534BEA /* VideoWatermarkService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoWatermarkService.swift; sourceTree = "<group>"; };
+		8E2D70D42EBD14DA00534BEA /* TabBarOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarOverlay.swift; sourceTree = "<group>"; };
 		8E62A6E52EBB59480093DBF2 /* SwipeSaver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwipeSaver.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E62A6E82EBB59480093DBF2 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		8E62A6EA2EBB59480093DBF2 /* Executor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Executor.swift; sourceTree = "<group>"; };
@@ -197,6 +205,17 @@
 			path = Networking;
 			sourceTree = "<group>";
 		};
+		8E2D70CD2EBD07CB00534BEA /* BrowserUnused */ = {
+			isa = PBXGroup;
+			children = (
+				8E62A7922EBBB1780093DBF2 /* Browser */,
+				8E62A7AE2EBBB1780093DBF2 /* BrowserFavorites */,
+				8E62A7A92EBBB1780093DBF2 /* BrowserHistory */,
+				8E62A7AC2EBBB1780093DBF2 /* BrowserTabs */,
+			);
+			path = BrowserUnused;
+			sourceTree = "<group>";
+		};
 		8E62A6DC2EBB59480093DBF2 = {
 			isa = PBXGroup;
 			children = (
@@ -266,6 +285,7 @@
 		8E62A73A2EBB5B420093DBF2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				8E2D70D22EBD128F00534BEA /* VideoWatermarkService.swift */,
 				8E2D70C82EBCD80B00534BEA /* Networking */,
 				8E62A7E92EBBB5A10093DBF2 /* FaviconService.swift */,
 				8E62A7DD2EBBB27B0093DBF2 /* UserDefaultsKeys.swift */,
@@ -282,10 +302,6 @@
 		8E62A73B2EBB5B4D0093DBF2 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
-				8E62A7922EBBB1780093DBF2 /* Browser */,
-				8E62A7AE2EBBB1780093DBF2 /* BrowserFavorites */,
-				8E62A7A92EBBB1780093DBF2 /* BrowserHistory */,
-				8E62A7AC2EBBB1780093DBF2 /* BrowserTabs */,
 				8E62A75A2EBB96330093DBF2 /* Saver */,
 				8E62A73E2EBB5C110093DBF2 /* Main */,
 				8E62A7492EBB60C70093DBF2 /* Downloads */,
@@ -293,6 +309,7 @@
 				8E62A7452EBB5D940093DBF2 /* Settings */,
 				8E62A7462EBB5D9F0093DBF2 /* SplashScreen */,
 				8E62A7472EBB5DA80093DBF2 /* Onboarding */,
+				8E2D70CD2EBD07CB00534BEA /* BrowserUnused */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -320,6 +337,7 @@
 			children = (
 				8E62A7042EBB59480093DBF2 /* MainView.swift */,
 				8E62A7002EBB59480093DBF2 /* TabBarView.swift */,
+				8E2D70D42EBD14DA00534BEA /* TabBarOverlay.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -358,6 +376,7 @@
 		8E62A7422EBB5CA70093DBF2 /* ViewComponents */ = {
 			isa = PBXGroup;
 			children = (
+				8E2D70D02EBD092D00534BEA /* VideoRow.swift */,
 				8E62A7F52EBBB9D70093DBF2 /* BorderedButton.swift */,
 				8E62A7F32EBBB9B10093DBF2 /* HeaderView.swift */,
 				8E62A7EF2EBBB9570093DBF2 /* FaviconView.swift */,
@@ -419,6 +438,7 @@
 		8E62A7482EBB60BE0093DBF2 /* UserFiles */ = {
 			isa = PBXGroup;
 			children = (
+				8E2D70CE2EBD082F00534BEA /* UserFilesView.swift */,
 			);
 			path = UserFiles;
 			sourceTree = "<group>";
@@ -608,6 +628,7 @@
 				8E62A7C52EBBB1790093DBF2 /* WebView.swift in Sources */,
 				8E62A7542EBB94E40093DBF2 /* FileManagerService.swift in Sources */,
 				8E62A7B82EBBB1780093DBF2 /* ResourceMonitor.swift in Sources */,
+				8E2D70CF2EBD082F00534BEA /* UserFilesView.swift in Sources */,
 				8E62A7CC2EBBB1790093DBF2 /* FavoriteGroupChip.swift in Sources */,
 				8E62A7D52EBBB21C0093DBF2 /* FavoriteGroup.swift in Sources */,
 				8E62A7F42EBBB9B10093DBF2 /* HeaderView.swift in Sources */,
@@ -634,6 +655,7 @@
 				8E62A7F02EBBB9570093DBF2 /* FaviconView.swift in Sources */,
 				8E62A7B62EBBB1780093DBF2 /* InternetBrowserView.swift in Sources */,
 				8E2D70CC2EBCDE8800534BEA /* SocialVideoModels.swift in Sources */,
+				8E2D70D32EBD128F00534BEA /* VideoWatermarkService.swift in Sources */,
 				8E62A6F92EBB59480093DBF2 /* DeviceInfo.swift in Sources */,
 				8E62A7C82EBBB1790093DBF2 /* BrowserHistoryView.swift in Sources */,
 				8E62A7C32EBBB1790093DBF2 /* AddressBarSuggestionsView.swift in Sources */,
@@ -652,6 +674,8 @@
 				8E62A7E42EBBB5400093DBF2 /* DividerView.swift in Sources */,
 				8E62A7B22EBBB1780093DBF2 /* BrowserPanelManager.swift in Sources */,
 				8E62A7072EBB59480093DBF2 /* AppSettings.swift in Sources */,
+				8E2D70D12EBD092D00534BEA /* VideoRow.swift in Sources */,
+				8E2D70D52EBD14DA00534BEA /* TabBarOverlay.swift in Sources */,
 				8E62A7F62EBBB9D70093DBF2 /* BorderedButton.swift in Sources */,
 				8E62A7E02EBBB4950093DBF2 /* BrowserFavoriteService.swift in Sources */,
 				8E62A7CB2EBBB1790093DBF2 /* FavoritesView.swift in Sources */,

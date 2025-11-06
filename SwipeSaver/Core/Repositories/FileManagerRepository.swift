@@ -20,7 +20,17 @@ final class FileManagerRepository: ObservableObject {
     
     // MARK: - Private Properties
     private let fileManagerService: FileManagerService
+    private let videoWatermarkService: VideoWatermarkService
     private let workingDirectory: URL
+    private let userDefaultsService: UserDefaultsService
+    
+    // MARK: - Settings
+    /// Включить водяной знак для сохраняемых видео (зависит от настроек и Premium статуса)
+    var isWatermarkEnabled: Bool {
+        let settings = userDefaultsService.load(AppSettings.self, forKey: .appSettings) ?? .default
+        // Водяной знак включен если: настройка включена И пользователь НЕ Premium
+        return settings.enableWatermark && !settings.isPremiumUser
+    }
     
     // MARK: - Computed Properties
     var formattedTotalSize: String {
@@ -36,9 +46,18 @@ final class FileManagerRepository: ObservableObject {
     /// Инициализация с кастомной директорией
     /// - Parameters:
     ///   - fileManagerService: Сервис файлового менеджера
+    ///   - videoWatermarkService: Сервис водяных знаков
+    ///   - userDefaultsService: Сервис пользовательских настроек
     ///   - directoryName: Имя рабочей директории внутри Documents
-    init(fileManagerService: FileManagerService, directoryName: String = "SavedVideos") {
+    init(
+        fileManagerService: FileManagerService,
+        videoWatermarkService: VideoWatermarkService,
+        userDefaultsService: UserDefaultsService = .shared,
+        directoryName: String = "SavedVideos"
+    ) {
         self.fileManagerService = fileManagerService
+        self.videoWatermarkService = videoWatermarkService
+        self.userDefaultsService = userDefaultsService
         
         // Создаем рабочую директорию
         let documentsURL = fileManagerService.documentsDirectory
@@ -171,8 +190,35 @@ final class FileManagerRepository: ObservableObject {
         platform: String,
         quality: String? = nil,
         extension ext: String = "mp4"
-    ) throws -> SavedVideo {
-        // Генерируем имя файла
+    ) async throws -> SavedVideo {
+        // Генерируем временное имя файла
+        let tempFileName = UUID().uuidString + ".\(ext)"
+        let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(tempFileName)
+        
+        // Сохраняем временный файл
+        try data.write(to: tempFileURL)
+        
+        // Применяем водяной знак, если включен
+        let processedFileURL: URL
+        if isWatermarkEnabled {
+            print("🎬 Применяем водяной знак...")
+            do {
+                processedFileURL = try await videoWatermarkService.applyWatermark(to: tempFileURL)
+                // Удаляем временный файл
+                try? FileManager.default.removeItem(at: tempFileURL)
+            } catch {
+                print("⚠️ Ошибка применения водяного знака: \(error.localizedDescription)")
+                print("⚠️ Сохраняем видео без водяного знака")
+                processedFileURL = tempFileURL
+            }
+        } else {
+            processedFileURL = tempFileURL
+        }
+        
+        // Читаем обработанное видео
+        let processedData = try Data(contentsOf: processedFileURL)
+        
+        // Генерируем финальное имя файла
         let fileName = generateVideoFileName(
             title: title,
             platform: platform,
@@ -180,8 +226,11 @@ final class FileManagerRepository: ObservableObject {
             extension: ext
         )
         
-        // Сохраняем файл
-        let fileURL = try saveFile(data: data, fileName: fileName)
+        // Сохраняем файл в рабочую директорию
+        let fileURL = try saveFile(data: processedData, fileName: fileName)
+        
+        // Удаляем обработанный временный файл
+        try? FileManager.default.removeItem(at: processedFileURL)
         
         // Создаем модель
         let savedVideo = SavedVideo(
@@ -191,7 +240,7 @@ final class FileManagerRepository: ObservableObject {
             platform: platform,
             title: title ?? "Untitled",
             dateAdded: Date(),
-            fileSize: Int64(data.count)
+            fileSize: Int64(processedData.count)
         )
         
         // Добавляем в список сохраненных видео

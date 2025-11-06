@@ -16,6 +16,14 @@ struct AppSettings: Codable {
     var notificationsEnabled: Bool = true
     var language: String = "en"
     
+    // MARK: - Watermark Settings
+    /// Включить водяной знак на видео (для бесплатной версии)
+    var enableWatermark: Bool = true
+    
+    // MARK: - Premium
+    /// Статус Premium подписки (для отключения водяного знака)
+    var isPremiumUser: Bool = false
+    
     // MARK: - Default
     static let `default` = AppSettings()
 }

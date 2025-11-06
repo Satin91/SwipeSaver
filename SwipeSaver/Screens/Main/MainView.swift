@@ -44,7 +44,7 @@ struct MainView: View {
     }
     
     private var mainContent: some View {
-//        InternetBrowserView()
+//        SaverView()
         NavigationStack(path: $coordinator.mainPath) {
             TabBarView()
                 .navigationDestination(for: Screen.self) { screen in

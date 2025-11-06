@@ -140,7 +140,7 @@ extension APIEndpoint: APIEndpointProtocol {
         switch self {
         case .fetchSocialVideo:
             // Базовый URL будет определяться из полного URL в path
-            return ""
+            return "https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink"
         }
     }
     
