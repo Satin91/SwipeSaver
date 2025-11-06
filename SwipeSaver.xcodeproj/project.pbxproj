@@ -169,7 +169,7 @@
 		8E62A7D22EBBB21C0093DBF2 /* BrowserHistoryItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserHistoryItem.swift; sourceTree = "<group>"; };
 		8E62A7D92EBBB2360093DBF2 /* WebViewRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewRepository.swift; sourceTree = "<group>"; };
 		8E62A7DB2EBBB2470093DBF2 /* BrowserTabsRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTabsRepository.swift; sourceTree = "<group>"; };
-		8E62A7DD2EBBB27B0093DBF2 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserDefaultsKeys.swift; path = ../../../../UntraX/UntraX/Core/Services/UserDefaultsKeys.swift; sourceTree = "<group>"; };
+		8E62A7DD2EBBB27B0093DBF2 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		8E62A7DF2EBBB4950093DBF2 /* BrowserFavoriteService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserFavoriteService.swift; sourceTree = "<group>"; };
 		8E62A7E12EBBB4FD0093DBF2 /* Color+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		8E62A7E32EBBB5400093DBF2 /* DividerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DividerView.swift; sourceTree = "<group>"; };
