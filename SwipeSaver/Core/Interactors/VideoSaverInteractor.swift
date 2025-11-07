@@ -21,6 +21,7 @@ final class VideoSaverInteractor: ObservableObject {
     private let videoSaverRepository: VideoSaverRepository
     private let networkRepository: NetworkRepository
     private let fileManagerRepository: FileManagerRepository
+    private let userDefaultsObserver: UserDefaultsObserver
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Computed Properties
@@ -30,11 +31,17 @@ final class VideoSaverInteractor: ObservableObject {
         return fileManagerRepository.savedVideos
     }
     
+    /// Список папок для видео (из UserDefaultsObserver)
+    var videoFolders: [VideoFolder] {
+        return userDefaultsObserver.videoFolders
+    }
+    
     // MARK: - Initialization
-    init(videoSaverRepository: VideoSaverRepository, fileManagerRepository: FileManagerRepository, networkRepository: NetworkRepository) {
+    init(videoSaverRepository: VideoSaverRepository, fileManagerRepository: FileManagerRepository, networkRepository: NetworkRepository, userDefaultsObserver: UserDefaultsObserver) {
         self.videoSaverRepository = videoSaverRepository
         self.networkRepository = networkRepository
         self.fileManagerRepository = fileManagerRepository
+        self.userDefaultsObserver = userDefaultsObserver
         setupSubscriptions()
     }
     
@@ -106,6 +113,13 @@ final class VideoSaverInteractor: ObservableObject {
     func deleteSavedVideo(_ video: SavedVideo) {
         do {
             try fileManagerRepository.deleteSavedVideo(video)
+            
+            // Удаляем видео из всех папок
+            var folders = userDefaultsObserver.videoFolders
+            for i in 0..<folders.count {
+                folders[i].removeVideo(video.id)
+            }
+            userDefaultsObserver.updateVideoFolders(folders)
         } catch {
             print("❌ Ошибка удаления видео: \(error.localizedDescription)")
             errorMessage = "Не удалось удалить видео"
@@ -125,14 +139,83 @@ final class VideoSaverInteractor: ObservableObject {
     /// Очистить все сохраненные видео
     func clearAllVideos() {
         fileManagerRepository.clearAllSavedVideos()
+        
+        // Очищаем все папки от видео
+        var folders = userDefaultsObserver.videoFolders
+        for i in 0..<folders.count {
+            folders[i].videoIds.removeAll()
+        }
+        userDefaultsObserver.updateVideoFolders(folders)
     }
+    
+    // MARK: - Folder Management
     
     /// Переместить видео в папку
     /// - Parameters:
-    ///   - video: Видео для перемещения
-    ///   - folderId: ID папки или nil для удаления из папки
-    func moveVideoToFolder(_ video: SavedVideo, folderId: UUID?) {
-        fileManagerRepository.moveVideoToFolder(video, folderId: folderId)
+    ///   - videoId: ID видео
+    ///   - toFolderId: ID папки назначения (nil для удаления из папки)
+    func moveVideoToFolder(_ videoId: UUID, toFolderId: UUID?) {
+        var folders = userDefaultsObserver.videoFolders
+        
+        // Удаляем видео из всех папок
+        for i in 0..<folders.count {
+            folders[i].removeVideo(videoId)
+        }
+        
+        // Добавляем в новую папку, если указана
+        if let toFolderId = toFolderId,
+           let folderIndex = folders.firstIndex(where: { $0.id == toFolderId }) {
+            folders[folderIndex].addVideo(videoId)
+            print("📁 Видео \(videoId) перемещено в папку \(folders[folderIndex].name)")
+        } else {
+            print("📁 Видео \(videoId) удалено из всех папок")
+        }
+        
+        // Обновляем состояние
+        userDefaultsObserver.updateVideoFolders(folders)
+    }
+    
+    /// Получить папку, в которой находится видео
+    /// - Parameter videoId: ID видео
+    /// - Returns: Папка или nil
+    func getFolderForVideo(_ videoId: UUID) -> VideoFolder? {
+        return userDefaultsObserver.getFolderForVideo(videoId)
+    }
+    
+    /// Получить видео в папке
+    /// - Parameter folder: Папка
+    /// - Returns: Массив видео
+    func getVideosInFolder(_ folder: VideoFolder) -> [SavedVideo] {
+        return savedVideos.filter { folder.videoIds.contains($0.id) }
+    }
+    
+    /// Получить видео без папки
+    /// - Returns: Массив видео
+    func getVideosWithoutFolder() -> [SavedVideo] {
+        let allFolderVideoIds = videoFolders.flatMap { $0.videoIds }
+        return savedVideos.filter { !allFolderVideoIds.contains($0.id) }
+    }
+    
+    /// Создать новую папку
+    /// - Parameters:
+    ///   - name: Название папки
+    ///   - iconName: Имя иконки
+    ///   - color: Цвет в hex формате
+    func createFolder(name: String, iconName: String, color: String) {
+        var folders = userDefaultsObserver.videoFolders
+        let newFolder = VideoFolder(name: name, iconName: iconName, color: color)
+        folders.append(newFolder)
+        userDefaultsObserver.updateVideoFolders(folders)
+        print("📁 Создана папка \(name)")
+    }
+    
+    /// Удалить папку
+    /// - Parameter folderId: ID папки
+    func deleteFolder(_ folderId: UUID) {
+        var folders = userDefaultsObserver.videoFolders
+        folders.removeAll { $0.id == folderId }
+        userDefaultsObserver.updateVideoFolders(folders)
+        print("📁 Папка удалена")
     }
     
     /// Определяет, является ли URL прямой ссылкой на видео файл

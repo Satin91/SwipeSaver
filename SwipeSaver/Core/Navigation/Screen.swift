@@ -10,19 +10,10 @@ import Foundation
 
 /// Перечисление всех экранов приложения
 enum Screen: Hashable, Identifiable {
-    case browserHistory(onTapHistoryItem: (URL?) -> Void)
-    case browserFavorites(onTapFavoriteItem: (URL?) -> Void)
-    case browserTabs(onSwitchTab: (UUID) -> Void)
     case settings
     
     var id: String {
         switch self {
-        case .browserHistory:
-            return "BrowserHistory"
-        case .browserFavorites:
-            return "BrowserFavorites"
-        case .browserTabs:
-            return "BrowserTabs"
         case .settings:
             return "Settings"
         }
@@ -36,12 +27,6 @@ enum Screen: Hashable, Identifiable {
         into hasher: inout Hasher
     ) {
         switch self {
-        case .browserHistory:
-            hasher.combine("browserHistory")
-        case .browserFavorites:
-            hasher.combine("browserFavorites")
-        case .browserTabs:
-            hasher.combine("browserTabs")
         case .settings:
             hasher.combine("settings")
         }

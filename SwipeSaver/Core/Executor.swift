@@ -21,10 +21,6 @@ class Executor {
         return container.appInteractor
     }
     
-    static var webViewInteractor: WebViewInteractor {
-        return container.webViewInteractor
-    }
-    
     /// Доступ к VideoSaverInteractor
     static var videoSaverInteractor: VideoSaverInteractor {
         return container.videoSaverInteractor

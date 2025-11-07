@@ -7,17 +7,26 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import Combine
 
 final class UserFilesViewModel: ObservableObject {
     let videoSaverInteractor = Executor.videoSaverInteractor
+    private let userDefaultsObserver = Executor.userDefaultsObserver
+    private var cancellables = Set<AnyCancellable>()
     
     @Published var searchText: String = ""
     @Published var sortOption: SortOption = .dateNewest
-    @Published var folders: [VideoFolder] = [
-        VideoFolder(name: "Избранное", iconName: "star.fill", color: "FFD700"),
-        VideoFolder(name: "Для работы", iconName: "briefcase.fill", color: "4A90E2")
-    ]
     @Published var draggedVideo: SavedVideo?
+    
+    init() {
+        // Подписываемся на изменения в UserDefaultsObserver
+        userDefaultsObserver.$videoFolders
+            .sink { [weak self] _ in
+                // Триггерим обновление UI через objectWillChange
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+    }
     
     enum SortOption: String, CaseIterable {
         case dateNewest = "Сначала новые"
@@ -86,15 +95,15 @@ final class UserFilesViewModel: ObservableObject {
     }
     
     func moveVideoToFolder(_ video: SavedVideo, folder: VideoFolder?) {
-        videoSaverInteractor.moveVideoToFolder(video, folderId: folder?.id)
+        videoSaverInteractor.moveVideoToFolder(video.id, toFolderId: folder?.id)
     }
     
     func getVideosInFolder(_ folder: VideoFolder) -> [SavedVideo] {
-        return videoSaverInteractor.savedVideos.filter { $0.folderId == folder.id }
+        return videoSaverInteractor.getVideosInFolder(folder)
     }
     
     func getVideosWithoutFolder() -> [SavedVideo] {
-        return videoSaverInteractor.savedVideos.filter { $0.folderId == nil }
+        return videoSaverInteractor.getVideosWithoutFolder()
     }
     
     func getFolderSize(_ folder: VideoFolder) -> Int64 {
@@ -152,22 +161,7 @@ struct UserFilesView: View {
                 }
                 .padding(.top, .regular)
             }
-            .background(
-                ZStack(content: {
-                    Color.tm.background
-                    LinearGradient(
-                        colors: [
-                                Color(hex: "1a1410"),  // Глубокий коричнево-чёрный
-                                Color(hex: "2d1b13"),  // Тёмный шоколад
-                                Color(hex: "3d2417")   // Каштановый
-                            ],
-                        startPoint: .bottomLeading,
-                        endPoint: .topTrailing
-                    )
-                    .opacity(0.15)
-                })
-                .ignoresSafeArea(.all)
-            )
+            .background(BackgroundGradient())
     }
     
     private var compactHeaderView: some View {
@@ -192,7 +186,7 @@ struct UserFilesView: View {
                 .foregroundColor(.tm.title)
             
             HStack(spacing: .regular) {
-                ForEach(viewModel.folders) { folder in
+                ForEach(viewModel.videoSaverInteractor.videoFolders) { folder in
                     FolderCardView(
                         folder: folder,
                         videosCount: viewModel.getVideosInFolder(folder).count,
@@ -238,22 +232,22 @@ struct UserFilesView: View {
     
     private var videosListView: some View {
         VStack(alignment: .leading, spacing: .regular) {
-            HStack {
-                if !interactor.savedVideos.isEmpty {
-                    Spacer()
-                    Button(action: {
-                        viewModel.clearAllVideos()
-                    }) {
-                        HStack(spacing: .smallExt) {
-                            Image(systemName: "trash")
-                            Text("Select")
-                        }
-                        .font(.captionTextMedium)
-                        .foregroundColor(.tm.accent)
-                    }
-                }
-            }
-            .padding(.horizontal, .medium)
+//            HStack {
+//                if !interactor.savedVideos.isEmpty {
+//                    Spacer()
+//                    Button(action: {
+//                        viewModel.clearAllVideos()
+//                    }) {
+//                        HStack(spacing: .smallExt) {
+//                            Image(systemName: "trash")
+//                            Text("Select")
+//                        }
+//                        .font(.captionTextMedium)
+//                        .foregroundColor(.tm.accent)
+//                    }
+//                }
+//            }
+//            .padding(.horizontal, .medium)
             
             ScrollView {
                 LazyVStack(spacing: .regular) {
@@ -266,7 +260,10 @@ struct UserFilesView: View {
                             return NSItemProvider(object: video.id.uuidString as NSString)
                         }
                         .contextMenu {
-                            if video.folderId != nil {
+                            // Проверяем, в какой папке находится видео
+                            let currentFolder = viewModel.videoSaverInteractor.getFolderForVideo(video.id)
+                            
+                            if currentFolder != nil {
                                 Button(action: {
                                     viewModel.moveVideoToFolder(video, folder: nil)
                                 }) {
@@ -426,7 +423,7 @@ struct FolderDetailView: View {
                         HStack(spacing: .regular) {
                             Image(systemName: folder.iconName)
                                 .font(.system(size: 32))
-                                .foregroundColor(Color(hex: folder.color) ?? .tm.accent)
+                                .foregroundStyle(Color(hex: folder.color))
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(folder.name)

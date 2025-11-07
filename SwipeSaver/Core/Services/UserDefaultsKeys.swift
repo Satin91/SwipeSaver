@@ -40,7 +40,7 @@ enum UserDefaultsKeys: String, CaseIterable {
     case selectedSearchEngine = "selectedSearchEngine"
     case browserTabs = "browserTabs"
     case activeTabId = "activeTabId"
-    case videoFolderMappings = "videoFolderMappings"
+    case videoFolders = "videoFolders"
     
     var key: String {
         return self.rawValue
