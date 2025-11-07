@@ -17,12 +17,14 @@ public enum ThemeColors: String {
     case subTitle = "Subtitle"
     case background = "Background"
     case backgroundSecondary = "BackgroundSecondary"
+    case backgroundTertiary = "BackgroundTertiary"
     case container = "Container"
     case error = "Error"
     case success = "Success"
     case inactive = "Inactive"
     case shadowColor = "ShadowColor"
-    case glassBorder = "GlassBorder"
+    case shineColor = "ShineColor"
+    case border = "Border"
     case glassOverlay = "GlassOverlay"
     
     var color: Color {
@@ -37,6 +39,7 @@ public struct Colors {
     public var accentTertiary: Color { ThemeColors.accentTertiary.color }
     public var background: Color { ThemeColors.background.color }
     public var backgroundSecondary: Color { ThemeColors.backgroundSecondary.color }
+    public var backgroundTertiary: Color { ThemeColors.backgroundTertiary.color }
     public var container: Color { ThemeColors.container.color }
     public var error: Color { ThemeColors.error.color }
     public var success: Color { ThemeColors.success.color }
@@ -45,7 +48,8 @@ public struct Colors {
     public var subTitle: Color { ThemeColors.subTitle.color }
     public var inactive: Color { ThemeColors.inactive.color }
     public var shadowColor: Color { ThemeColors.shadowColor.color }
-    public var glassBorder: Color { ThemeColors.glassBorder.color }
+    public var shineColor: Color { ThemeColors.shineColor.color }
+    public var border: Color { ThemeColors.border.color }
     public var glassOverlay: Color { ThemeColors.glassOverlay.color }
 }
 

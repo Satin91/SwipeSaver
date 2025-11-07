@@ -28,31 +28,34 @@ final class VideoSaverRepository: ObservableObject {
     
     // MARK: - Public Methods
     
-    /// Начать загрузку видео
+    /// Загрузить видео по URL (возвращает только данные)
     /// - Parameter urlString: URL видео в виде строки
-    /// - Returns: Результат загрузки
+    /// - Returns: Данные видео
     @MainActor
-    func startDownload(from urlString: String) async throws -> VideoDownloadResult {
+    func downloadVideo(from urlString: String) async throws -> Data {
         // Валидация URL
         guard let url = URL(string: urlString) else {
             throw VideoDownloadError.invalidURL
-        }
-        
-        // Проверка поддержки платформы
-        guard videoSaverService.isSupported(url: url) else {
-            throw VideoDownloadError.unsupportedPlatform
         }
         
         print("📥 Загрузка начата для: \(urlString)")
         
         // Запускаем загрузку с отслеживанием прогресса
         do {
-            let result = try await videoSaverService.downloadVideo(from: url) { [weak self] progress in
-                self?.currentProgress = progress
+            let videoData = try await videoSaverService.downloadVideo(from: url) { [weak self] progress in
+                Task { @MainActor in
+                    self?.currentProgress = progress
+                }
             }
-            handleDownloadUpdate(result)
-            return result
+            
+            // Сбрасываем прогресс после завершения
+            currentProgress = 0.0
+            
+            return videoData
         } catch {
+            // Сбрасываем прогресс при ошибке
+            currentProgress = 0.0
+            
             if let downloadError = error as? VideoDownloadError {
                 throw downloadError
             }
@@ -93,6 +96,16 @@ final class VideoSaverRepository: ObservableObject {
     @MainActor
     func clearCompletedDownloads() {
         completedDownloads.removeAll()
+    }
+    
+    /// Загрузить видео по прямой ссылке (для соц. сетей)
+    /// - Parameters:
+    ///   - urlString: Прямая ссылка на видео
+    /// - Returns: Данные видео
+    @MainActor
+    func downloadDirectVideo(from urlString: String) async throws -> Data {
+        // Просто используем общий метод downloadVideo
+        return try await downloadVideo(from: urlString)
     }
     
     // MARK: - Private Methods

@@ -12,7 +12,6 @@ import SwiftUI
 struct MainView: View {
     @StateObject private var coordinator = Coordinator()
     @StateObject private var appState = AppState()
-    @StateObject private var themeRepository = Executor.themeRepository
     @Environment(\.scenePhase) private var scenePhase
     
     private let appInteractor = Executor.appInteractor
@@ -21,7 +20,7 @@ struct MainView: View {
         content
             .environmentObject(appState)
             .environmentObject(coordinator)
-            .preferredColorScheme(themeRepository.colorScheme)
+            .preferredColorScheme(.dark)
             .fullScreenCover(item: $coordinator.presentedScreen) { screen in
                 coordinator.build(screen: screen)
             }
@@ -45,6 +44,7 @@ struct MainView: View {
     }
     
     private var mainContent: some View {
+//        SaverView()
         NavigationStack(path: $coordinator.mainPath) {
             TabBarView()
                 .navigationDestination(for: Screen.self) { screen in
