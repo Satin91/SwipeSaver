@@ -127,6 +127,14 @@ final class VideoSaverInteractor: ObservableObject {
         fileManagerRepository.clearAllSavedVideos()
     }
     
+    /// Переместить видео в папку
+    /// - Parameters:
+    ///   - video: Видео для перемещения
+    ///   - folderId: ID папки или nil для удаления из папки
+    func moveVideoToFolder(_ video: SavedVideo, folderId: UUID?) {
+        fileManagerRepository.moveVideoToFolder(video, folderId: folderId)
+    }
+    
     /// Определяет, является ли URL прямой ссылкой на видео файл
     /// - Parameter urlString: URL для проверки
     /// - Returns: true, если это прямая ссылка на видео, false - если это ссылка на соц. сеть

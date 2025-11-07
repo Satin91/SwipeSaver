@@ -37,52 +37,18 @@ struct MaterialCardModifier: ViewModifier {
                     // Overlays with inner shadows
                     RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(.tm.container)
-                        .overlay(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: cornerRadius)
-                                .fill(Color.clear)
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [topShadowColor.opacity(0.2), .tm.border.opacity(0)],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    ),
-                                    lineWidth: 1
-                                )
-                        }
-                    // Top inner shadow (light)
-//                        .overlay(
+//                        .overlay(alignment: .leading) {
 //                            RoundedRectangle(cornerRadius: cornerRadius)
-//                                .stroke(topShadowColor, lineWidth: 1)
-//                                .blur(radius: 0.1)
-//                                .offset(y: 0.8)
-//                                .mask(
-//                                    RoundedRectangle(cornerRadius: cornerRadius)
-//                                        .fill(
-//                                            LinearGradient(
-//                                                colors: [topShadowColor, topShadowColor.opacity(0.5), topShadowColor.opacity(0.1)],
-//                                                startPoint: .top,
-//                                                endPoint: .bottom
-//                                            )
-//                                        )
+//                                .fill(Color.clear)
+//                                .stroke(
+//                                    LinearGradient(
+//                                        colors: [.tm.border,.tm.border,.tm.border,.tm.border, .tm.border.opacity(0.6)],
+//                                        startPoint: UnitPoint(x: 0.0, y: 0.4),
+//                                        endPoint: UnitPoint(x: 0.3, y: 0.9)
+//                                    ),
+//                                    lineWidth: 1
 //                                )
-//                        )
-//                     // Bottom inner shadow (dark)
-//                        .overlay(
-//                            RoundedRectangle(cornerRadius: cornerRadius)
-//                                .stroke(bottomShadowColor.opacity(0.18), lineWidth: 1.5)
-//                                .blur(radius: 0.4)
-//                                .offset(y: -0.2)
-//                                .mask(
-//                                    RoundedRectangle(cornerRadius: cornerRadius)
-//                                        .fill(
-//                                            LinearGradient(
-//                                                colors: [Color.black.opacity(0), Color.black.opacity(0.3), Color.black],
-//                                                startPoint: UnitPoint(x: 0.5, y: 0.7),
-//                                                endPoint: .bottom
-//                                            )
-//                                        )
-//                                )
-//                        )
+//                        }
                 }
             )
     }
@@ -124,6 +90,19 @@ extension View {
             .padding(.horizontal)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.tm.background)
+//    .background(Color.tm.background)
+    .background(
+        ZStack(content: {
+            Color.black
+            LinearGradient(
+                colors: [Color.accentColor,
+                .tm.accentSecondary],
+                startPoint: .bottomLeading,
+                endPoint: .topTrailing
+            )
+            .opacity(0.35)
+        })
+        .ignoresSafeArea(.all)
+    )
 }
 

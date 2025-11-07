@@ -217,9 +217,10 @@ struct SavedVideo: Codable, Identifiable {
     let title: String?
     let dateAdded: Date
     let fileSize: Int64
+    var folderId: UUID? // ID папки, в которой находится видео
     
     /// Инициализация из FileInfo
-    init(from fileInfo: FileInfo, platform: VideoPlatform?, title: String? = nil) {
+    init(from fileInfo: FileInfo, platform: VideoPlatform?, title: String? = nil, folderId: UUID? = nil) {
         self.id = fileInfo.id
         self.fileName = fileInfo.fileName
         self.fileURL = fileInfo.fileURL
@@ -227,10 +228,11 @@ struct SavedVideo: Codable, Identifiable {
         self.title = title
         self.dateAdded = fileInfo.createdDate
         self.fileSize = fileInfo.fileSize
+        self.folderId = folderId
     }
     
     /// Стандартная инициализация
-    init(id: UUID, fileName: String, fileURL: URL, platform: String, title: String?, dateAdded: Date, fileSize: Int64) {
+    init(id: UUID, fileName: String, fileURL: URL, platform: String, title: String?, dateAdded: Date, fileSize: Int64, folderId: UUID? = nil) {
         self.id = id
         self.fileName = fileName
         self.fileURL = fileURL
@@ -238,6 +240,26 @@ struct SavedVideo: Codable, Identifiable {
         self.title = title
         self.dateAdded = dateAdded
         self.fileSize = fileSize
+        self.folderId = folderId
+    }
+}
+
+// MARK: - Video Folder
+
+/// Модель папки для видео
+struct VideoFolder: Codable, Identifiable {
+    let id: UUID
+    var name: String
+    var iconName: String
+    var color: String // Hex color
+    let dateCreated: Date
+    
+    init(id: UUID = UUID(), name: String, iconName: String, color: String, dateCreated: Date = Date()) {
+        self.id = id
+        self.name = name
+        self.iconName = iconName
+        self.color = color
+        self.dateCreated = dateCreated
     }
 }
 

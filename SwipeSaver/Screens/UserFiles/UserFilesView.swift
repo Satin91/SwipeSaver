@@ -6,12 +6,18 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 final class UserFilesViewModel: ObservableObject {
     let videoSaverInteractor = Executor.videoSaverInteractor
     
     @Published var searchText: String = ""
     @Published var sortOption: SortOption = .dateNewest
+    @Published var folders: [VideoFolder] = [
+        VideoFolder(name: "Избранное", iconName: "star.fill", color: "FFD700"),
+        VideoFolder(name: "Для работы", iconName: "briefcase.fill", color: "4A90E2")
+    ]
+    @Published var draggedVideo: SavedVideo?
     
     enum SortOption: String, CaseIterable {
         case dateNewest = "Сначала новые"
@@ -78,27 +84,48 @@ final class UserFilesViewModel: ObservableObject {
     func clearAllVideos() {
         videoSaverInteractor.clearAllVideos()
     }
+    
+    func moveVideoToFolder(_ video: SavedVideo, folder: VideoFolder?) {
+        videoSaverInteractor.moveVideoToFolder(video, folderId: folder?.id)
+    }
+    
+    func getVideosInFolder(_ folder: VideoFolder) -> [SavedVideo] {
+        return videoSaverInteractor.savedVideos.filter { $0.folderId == folder.id }
+    }
+    
+    func getVideosWithoutFolder() -> [SavedVideo] {
+        return videoSaverInteractor.savedVideos.filter { $0.folderId == nil }
+    }
+    
+    func getFolderSize(_ folder: VideoFolder) -> Int64 {
+        let videos = getVideosInFolder(folder)
+        return videos.reduce(0) { $0 + $1.fileSize }
+    }
+    
+    func formatFolderSize(_ bytes: Int64) -> String {
+        return ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+    }
 }
 
 struct UserFilesView: View {
     @StateObject private var viewModel = UserFilesViewModel()
     @ObservedObject private var interactor = Executor.videoSaverInteractor
     @State private var showingSortOptions = false
+    @State private var selectedFolder: VideoFolder?
     
     var body: some View {
         content
-        .sheet(isPresented: $showingSortOptions) {
-            sortOptionsSheet
-        }
+            .sheet(isPresented: $showingSortOptions) {
+                sortOptionsSheet
+            }
+            .sheet(item: $selectedFolder) { folder in
+                FolderDetailView(folder: folder, viewModel: viewModel)
+            }
     }
     
     // MARK: - Compact Header
     
     var content: some View {
-        ZStack {
-            Color.tm.background
-                .ignoresSafeArea()
-            
             VStack(spacing: .regular) {
                 // Компактный Header
                 compactHeaderView
@@ -108,7 +135,10 @@ struct UserFilesView: View {
                 VStack(spacing: .medium) {
                     // Поиск и сортировка
                     searchAndSortSection
-                    
+                        .padding(.horizontal, .medium)
+                    // Папки
+                    foldersSection
+                        .padding(.horizontal, .medium)
                     // Список видео
                     if viewModel.filteredAndSortedVideos.isEmpty {
                         if viewModel.searchText.isEmpty {
@@ -120,10 +150,24 @@ struct UserFilesView: View {
                         videosListView
                     }
                 }
-                .padding(.horizontal, .medium)
                 .padding(.top, .regular)
             }
-        }
+            .background(
+                ZStack(content: {
+                    Color.tm.background
+                    LinearGradient(
+                        colors: [
+                                Color(hex: "1a1410"),  // Глубокий коричнево-чёрный
+                                Color(hex: "2d1b13"),  // Тёмный шоколад
+                                Color(hex: "3d2417")   // Каштановый
+                            ],
+                        startPoint: .bottomLeading,
+                        endPoint: .topTrailing
+                    )
+                    .opacity(0.15)
+                })
+                .ignoresSafeArea(.all)
+            )
     }
     
     private var compactHeaderView: some View {
@@ -139,6 +183,34 @@ struct UserFilesView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     
+    // MARK: - Folders Section
+    
+    private var foldersSection: some View {
+        VStack(alignment: .leading, spacing: .regular) {
+            Text("Папки")
+                .font(.tm.defaultTextMedium)
+                .foregroundColor(.tm.title)
+            
+            HStack(spacing: .regular) {
+                ForEach(viewModel.folders) { folder in
+                    FolderCardView(
+                        folder: folder,
+                        videosCount: viewModel.getVideosInFolder(folder).count,
+                        folderSize: viewModel.getFolderSize(folder),
+                        formattedSize: viewModel.formatFolderSize(viewModel.getFolderSize(folder)),
+                        onTap: {
+                            selectedFolder = folder
+                        },
+                        onDrop: { video in
+                            viewModel.moveVideoToFolder(video, folder: folder)
+                        }
+                    )
+                    .environmentObject(viewModel)
+                }
+            }
+        }
+    }
+    
     // MARK: - Search and Sort
     
     private var searchAndSortSection: some View {
@@ -150,12 +222,14 @@ struct UserFilesView: View {
             Button(action: {
                 showingSortOptions = true
             }) {
-                Image(systemName: "arrow.up.arrow.down.circle")
-                    .font(.system(size: 24))
-                    .foregroundColor(.tm.accent)
-                    .frame(width: 44, height: 44)
-                    .background(Color.tm.container)
-                    .cornerRadius(Layout.Radius.regular)
+                Image(.sort)
+                    .resizable()
+                    .renderingMode(.template)
+                    .foregroundStyle(.tm.accent)
+                    .frame(width: 28, height: 28)
+                    .padding(.regular)
+                    .material(cornerRadius: Layout.Radius.regular)
+//                    .cornerRadius(Layout.Radius.regular)
             }
         }
     }
@@ -165,34 +239,44 @@ struct UserFilesView: View {
     private var videosListView: some View {
         VStack(alignment: .leading, spacing: .regular) {
             HStack {
-                Text("Файлы (\(viewModel.filteredAndSortedVideos.count))")
-                    .font(.headline)
-                    .foregroundColor(.tm.title)
-                
-                Spacer()
-                
                 if !interactor.savedVideos.isEmpty {
+                    Spacer()
                     Button(action: {
                         viewModel.clearAllVideos()
                     }) {
                         HStack(spacing: .smallExt) {
                             Image(systemName: "trash")
-                            Text("Очистить")
+                            Text("Select")
                         }
-                        .font(.caption)
-                        .foregroundColor(.tm.error)
+                        .font(.captionTextMedium)
+                        .foregroundColor(.tm.accent)
                     }
                 }
             }
+            .padding(.horizontal, .medium)
             
             ScrollView {
                 LazyVStack(spacing: .regular) {
                     ForEach(viewModel.filteredAndSortedVideos) { video in
-                        VideoRow(video: video, onDelete: {
+                        VideoRow(video: video, onAction: {
                             viewModel.deleteVideo(video)
                         })
+                        .onDrag {
+                            viewModel.draggedVideo = video
+                            return NSItemProvider(object: video.id.uuidString as NSString)
+                        }
+                        .contextMenu {
+                            if video.folderId != nil {
+                                Button(action: {
+                                    viewModel.moveVideoToFolder(video, folder: nil)
+                                }) {
+                                    Label("Убрать из папки", systemImage: "folder.badge.minus")
+                                }
+                            }
+                        }
                     }
                 }
+                .padding(.horizontal, .medium)
             }
         }
     }
@@ -316,6 +400,172 @@ struct StatCard: View {
         .padding(.medium)
         .background(Color.tm.container)
         .cornerRadius(Layout.Radius.regular)
+    }
+}
+
+// MARK: - Folder Detail View
+
+struct FolderDetailView: View {
+    let folder: VideoFolder
+    @ObservedObject var viewModel: UserFilesViewModel
+    @Environment(\.dismiss) var dismiss
+    
+    var folderVideos: [SavedVideo] {
+        viewModel.getVideosInFolder(folder)
+    }
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.tm.background
+                    .ignoresSafeArea()
+                
+                VStack(spacing: .medium) {
+                    // Заголовок
+                    VStack(alignment: .leading, spacing: .small) {
+                        HStack(spacing: .regular) {
+                            Image(systemName: folder.iconName)
+                                .font(.system(size: 32))
+                                .foregroundColor(Color(hex: folder.color) ?? .tm.accent)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(folder.name)
+                                    .font(.tm.largeTitle)
+                                    .foregroundColor(.tm.title)
+                                
+                                Text("\(folderVideos.count) видео")
+                                    .font(.tm.hintText)
+                                    .foregroundColor(.tm.subTitle)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal, .medium)
+                        .padding(.top, .medium)
+                    }
+                    
+                    // Список видео
+                    if folderVideos.isEmpty {
+                        emptyFolderView
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: .regular) {
+                                ForEach(folderVideos) { video in
+                                    VideoRow(video: video, onAction: {
+                                        viewModel.deleteVideo(video)
+                                    })
+                                    .contextMenu {
+                                        Button(action: {
+                                            viewModel.moveVideoToFolder(video, folder: nil)
+                                        }) {
+                                            Label("Убрать из папки", systemImage: "folder.badge.minus")
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, .medium)
+                        }
+                    }
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Готово") {
+                        dismiss()
+                    }
+                    .foregroundColor(.tm.accent)
+                }
+            }
+        }
+    }
+    
+    private var emptyFolderView: some View {
+        VStack(spacing: .medium) {
+            Image(systemName: folder.iconName)
+                .font(.system(size: 50))
+                .foregroundColor(.tm.subTitle)
+            
+            Text("Папка пуста")
+                .font(.headline)
+                .foregroundColor(.tm.title)
+            
+            Text("Перетащите видео в эту папку для организации файлов")
+                .font(.caption)
+                .foregroundColor(.tm.subTitle)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.extraLarge)
+        .background(Color.tm.container)
+        .cornerRadius(Layout.Radius.medium)
+        .padding(.horizontal, .medium)
+    }
+}
+
+// MARK: - Folder Card Component
+
+struct FolderCardView: View {
+    let folder: VideoFolder
+    let videosCount: Int
+    let folderSize: Int64
+    let formattedSize: String
+    let onTap: () -> Void
+    let onDrop: (SavedVideo) -> Void
+    
+    @State private var isTargeted = false
+    @State private var scale: CGFloat = 1.0
+    @EnvironmentObject var viewModel: UserFilesViewModel
+    
+    var folderDescription: String {
+        if videosCount == 0 {
+            return "Пусто"
+        } else {
+            return "\(videosCount) • \(formattedSize)"
+        }
+    }
+    
+    var body: some View {
+        Button(action: onTap) {
+            VStack(alignment: .leading, spacing: .small) {
+                // Название папки
+                Text(folder.name)
+                    .font(.tm.title)
+                    .foregroundColor(.tm.title)
+                    .lineLimit(1)
+                
+                Spacer()
+                
+                // Описание состояния
+                Text(folderDescription)
+                    .font(.tm.defaultText)
+                    .foregroundColor(videosCount == 0 ? .tm.subTitle : .tm.accent)
+            }
+            .padding(.medium)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(height: 80)
+            .material(cornerRadius: Layout.Radius.medium)
+            .overlay(
+                RoundedRectangle(cornerRadius: Layout.Radius.medium)
+                    .stroke(isTargeted ? Color(hex: folder.color) : Color.clear, lineWidth: 2)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+        .scaleEffect(scale)
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: scale)
+        .onDrop(of: [.text], isTargeted: $isTargeted) { providers in
+            guard let draggedVideo = viewModel.draggedVideo else { return false }
+            
+            // Тактильная отдачка
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+            
+            onDrop(draggedVideo)
+            return true
+        }
+        .onChange(of: isTargeted) { newValue in
+            scale = newValue ? 1.05 : 1.0
+        }
     }
 }
 

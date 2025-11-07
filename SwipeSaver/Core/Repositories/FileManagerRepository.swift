@@ -9,6 +9,12 @@
 import Foundation
 import Combine
 
+/// Структура для хранения связей видео-папка в UserDefaults
+struct VideoFolderMapping: Codable {
+    let videoId: String  // UUID видео в виде строки
+    let folderId: String? // UUID папки в виде строки или nil
+}
+
 /// Репозиторий для управления файлами приложения
 final class FileManagerRepository: ObservableObject {
     
@@ -69,7 +75,7 @@ final class FileManagerRepository: ObservableObject {
         // Загружаем начальные данные
         loadFiles()
         updateDiskSpace()
-        loadSavedVideos()
+        loadSavedVideos() // Теперь loadSavedVideos сам подгружает маппинги
     }
     
     // MARK: - Public Methods
@@ -300,6 +306,9 @@ final class FileManagerRepository: ObservableObject {
         // Удаляем из списка
         savedVideos.removeAll { $0.id == video.id }
         
+        // Удаляем связь из UserDefaults
+        removeFolderMapping(videoId: video.id)
+        
         print("🗑️ Видео удалено: \(video.fileName)")
     }
     
@@ -307,19 +316,101 @@ final class FileManagerRepository: ObservableObject {
     func clearAllSavedVideos() {
         deleteAllFiles()
         savedVideos.removeAll()
+        
+        // Очищаем все связи через UserDefaultsService
+        userDefaultsService.delete(forKey: .videoFolderMappings)
+        
         print("🗑️ Все видео удалены")
+    }
+    
+    /// Переместить видео в папку
+    /// - Parameters:
+    ///   - video: Видео для перемещения
+    ///   - folderId: ID папки или nil для удаления из папки
+    func moveVideoToFolder(_ video: SavedVideo, folderId: UUID?) {
+        if let index = savedVideos.firstIndex(where: { $0.id == video.id }) {
+            var updatedVideo = savedVideos[index]
+            updatedVideo = SavedVideo(
+                id: updatedVideo.id,
+                fileName: updatedVideo.fileName,
+                fileURL: updatedVideo.fileURL,
+                platform: updatedVideo.platform,
+                title: updatedVideo.title,
+                dateAdded: updatedVideo.dateAdded,
+                fileSize: updatedVideo.fileSize,
+                folderId: folderId
+            )
+            savedVideos[index] = updatedVideo
+            
+            // Сохраняем в UserDefaults
+            saveFolderMapping(videoId: updatedVideo.id, folderId: folderId)
+            
+            print("📁 Видео перемещено: \(video.fileName) -> папка: \(folderId?.uuidString ?? "без папки")")
+        }
+    }
+    
+    // MARK: - UserDefaults Methods
+    
+    /// Сохранить связь видео-папка в UserDefaults
+    private func saveFolderMapping(videoId: UUID, folderId: UUID?) {
+        var mappings = loadAllFolderMappings()
+        
+        // Удаляем старую связь для этого видео
+        mappings.removeAll { $0.videoId == videoId.uuidString }
+        
+        // Добавляем новую связь
+        let newMapping = VideoFolderMapping(
+            videoId: videoId.uuidString,
+            folderId: folderId?.uuidString
+        )
+        mappings.append(newMapping)
+        
+        print("💾 Сохраняем маппинг: Видео \(videoId.uuidString) -> Папка \(folderId?.uuidString ?? "nil")")
+        print("💾 Всего маппингов: \(mappings.count)")
+        
+        // Сохраняем через UserDefaultsService
+        userDefaultsService.save(mappings, forKey: .videoFolderMappings)
+    }
+    
+    /// Загрузить все связи видео-папка из UserDefaults
+    private func loadAllFolderMappings() -> [VideoFolderMapping] {
+        return userDefaultsService.load([VideoFolderMapping].self, forKey: .videoFolderMappings) ?? []
+    }
+    
+    /// Удалить связь видео-папка при удалении видео
+    private func removeFolderMapping(videoId: UUID) {
+        var mappings = loadAllFolderMappings()
+        mappings.removeAll { $0.videoId == videoId.uuidString }
+        userDefaultsService.save(mappings, forKey: .videoFolderMappings)
     }
     
     /// Загрузить сохраненные видео (приватный метод для инициализации)
     private func loadSavedVideos() {
         let videoFiles = getFiles(withExtensions: ["mp4", "mov", "avi"])
         
+        // Загружаем маппинги папок
+        let mappings = loadAllFolderMappings()
+        let mappingsDict = Dictionary(uniqueKeysWithValues: mappings.map { ($0.videoId, $0.folderId) })
+        
+        print("📁 Загружено маппингов из UserDefaults: \(mappings.count)")
+        mappings.forEach { print("  📌 Видео: \($0.videoId) -> Папка: \($0.folderId ?? "nil")") }
+        
         savedVideos = videoFiles.map { fileInfo in
             let platform = VideoPlatform.extractFromFileName(fileInfo.fileName)
-            return SavedVideo(from: fileInfo, platform: platform)
+            
+            // Проверяем, есть ли сохраненная связь с папкой
+            let folderIdString = mappingsDict[fileInfo.id.uuidString]
+            let folderId = folderIdString?.flatMap { UUID(uuidString: $0) }
+            
+            if folderId != nil {
+                print("  ✅ Видео \(fileInfo.fileName) восстановлено в папку \(folderId!.uuidString)")
+            }
+            
+            return SavedVideo(from: fileInfo, platform: platform, folderId: folderId)
         }
         
         print("📁 Загружено сохраненных видео: \(savedVideos.count)")
+        print("📁 Видео в папках: \(savedVideos.filter { $0.folderId != nil }.count)")
     }
     
     /// Обновить список сохраненных видео

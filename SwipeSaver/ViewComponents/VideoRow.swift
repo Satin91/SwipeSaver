@@ -9,24 +9,24 @@ import SwiftUI
 
 struct VideoRow: View {
     let video: SavedVideo
-    let onDelete: () -> Void
+    let onAction: () -> Void
     
     var body: some View {
         HStack(spacing: .medium) {
             // Иконка платформы
-            platformIcon
+//            platformIcon
             
             // Информация о видео
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: .regular) {
                 Text(video.fileName)
                     .font(.tm.defaultTextMedium)
                     .foregroundColor(.tm.title)
                     .lineLimit(1)
                 
-                HStack(spacing: 8) {
+                HStack(spacing: .smallExt) {
                     Text(video.platform)
                         .font(.tm.captionText)
-                        .foregroundColor(.tm.accent)
+                        .foregroundColor(.tm.accentSecondary)
                     
                     Text("•")
                         .font(.tm.captionText)
@@ -48,7 +48,7 @@ struct VideoRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             
             // Кнопка удаления
-            Button(action: onDelete) {
+            Button(action: onAction) {
                 Image(.more)
                     .resizable()
                     .renderingMode(.template)
@@ -58,7 +58,7 @@ struct VideoRow: View {
         }
         .padding(.horizontal, .medium)
         .padding(.vertical, .medium)
-        .material()
+        .material(cornerRadius: Layout.Radius.large)
     }
     
     @ViewBuilder
@@ -66,7 +66,7 @@ struct VideoRow: View {
         Image(.video)
             .resizable()
             .renderingMode(.template)
-            .foregroundColor(Color.tm.accent)
+            .foregroundColor(Color.tm.title)
             .frame(width: 44, height: 44)
             .cornerRadius(Layout.Radius.small)
     }

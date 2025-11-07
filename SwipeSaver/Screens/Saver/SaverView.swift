@@ -215,7 +215,7 @@ struct SaverView: View {
         ScrollView {
             LazyVStack(spacing: .regular) {
                 ForEach(interactor.savedVideos) { video in
-                    VideoRow(video: video, onDelete: {
+                    VideoRow(video: video, onAction: {
                         interactor.deleteSavedVideo(video)
                     })
                 }
