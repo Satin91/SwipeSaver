@@ -31,9 +31,6 @@ struct SaverView: View {
     
     var body: some View {
         VStack(spacing: .medium) {
-            // Header с информацией
-            headerView
-            
             // Поле ввода URL
             urlInputSection
             
@@ -58,41 +55,6 @@ struct SaverView: View {
         .background(Color.tm.background.ignoresSafeArea())
     }
     
-    // MARK: - Header
-    
-    private var headerView: some View {
-        VStack(spacing: .regular) {
-            HStack {
-                VStack(alignment: .leading, spacing: .smallExt) {
-                    Text("Сохранено видео")
-                        .font(.caption)
-                        .foregroundColor(.tm.subTitle)
-                    
-                    Text("\(interactor.savedVideos.count)")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.tm.title)
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: .smallExt) {
-                    Text("Общий размер")
-                        .font(.caption)
-                        .foregroundColor(.tm.subTitle)
-                    
-                    Text(interactor.getFormattedTotalSize())
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.tm.accent)
-                }
-            }
-            .padding(.medium)
-            .background(Color.tm.container)
-            .cornerRadius(Layout.Radius.medium)
-        }
-    }
-    
     // MARK: - URL Input
     
     private var urlInputSection: some View {
@@ -102,25 +64,12 @@ struct SaverView: View {
                 .foregroundColor(.tm.title)
             
             HStack(spacing: .regular) {
-                Image(systemName: "link")
-                    .foregroundColor(.tm.accent)
-                    .font(.system(size: 20))
-                
-                TextField("https://youtube.com/watch?v=...", text: $viewModel.urlText)
-                    .textFieldStyle(.plain)
-                    .foregroundColor(.tm.title)
+                TextFieldView(placeholder: "Enter url", text: $viewModel.urlText, image: .link)
+//                    .textFieldStyle(.plain)
+//                    .foregroundColor(.tm.title)
                     .autocapitalization(.none)
                     .keyboardType(.URL)
                     .disabled(interactor.isDownloading)
-                
-                if !viewModel.urlText.isEmpty {
-                    Button(action: {
-                        viewModel.urlText = ""
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.tm.subTitle)
-                    }
-                }
             }
             .padding(.medium)
             .background(Color.tm.container)

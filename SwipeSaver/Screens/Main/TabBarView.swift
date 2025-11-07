@@ -10,7 +10,7 @@ import SwiftUI
 
 /// Главный TabBar приложения
 struct TabBarView: View {
-    @State private var selection: Int = 0
+    @State private var selection: Int = 1
     @EnvironmentObject var appState: AppState
     
     let items: [TabItem] = [

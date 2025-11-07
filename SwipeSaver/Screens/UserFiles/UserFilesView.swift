@@ -86,17 +86,29 @@ struct UserFilesView: View {
     @State private var showingSortOptions = false
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.tm.background
-                    .ignoresSafeArea()
+        content
+        .sheet(isPresented: $showingSortOptions) {
+            sortOptionsSheet
+        }
+    }
+    
+    // MARK: - Compact Header
+    
+    var content: some View {
+        ZStack {
+            Color.tm.background
+                .ignoresSafeArea()
+            
+            VStack(spacing: .regular) {
+                // Компактный Header
+                compactHeaderView
+                    .padding(.horizontal, .medium)
+                    .padding(.top, .medium)
                 
                 VStack(spacing: .medium) {
-                    // Статистика
-                    statisticsView
-                    
                     // Поиск и сортировка
                     searchAndSortSection
+                    
                     // Список видео
                     if viewModel.filteredAndSortedVideos.isEmpty {
                         if viewModel.searchText.isEmpty {
@@ -109,67 +121,32 @@ struct UserFilesView: View {
                     }
                 }
                 .padding(.horizontal, .medium)
-                .padding(.top, .medium)
-            }
-            .navigationTitle("Мои файлы")
-            .navigationBarTitleDisplayMode(.large)
-            .sheet(isPresented: $showingSortOptions) {
-                sortOptionsSheet
+                .padding(.top, .regular)
             }
         }
     }
     
-    // MARK: - Statistics
-    
-    private var statisticsView: some View {
-        HStack(spacing: .medium) {
-            // Количество видео
-            StatCard(
-                title: "Всего видео",
-                value: "\(viewModel.totalVideosCount)",
-                icon: "film.stack",
-                color: .tm.accent
-            )
+    private var compactHeaderView: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Files")
+                .font(.tm.largeTitle)
+                .foregroundColor(.tm.title)
             
-            // Общий размер
-            StatCard(
-                title: "Общий размер",
-                value: viewModel.totalSize,
-                icon: "internaldrive",
-                color: .tm.accentSecondary
-            )
+            Text("\(viewModel.totalVideosCount) videos • \(viewModel.totalSize)")
+                .font(.tm.hintText)
+                .foregroundColor(.tm.subTitle)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     // MARK: - Search and Sort
     
     private var searchAndSortSection: some View {
         HStack(spacing: .regular) {
-            // Поиск
-            HStack(spacing: .regular) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.tm.subTitle)
-                    .font(.system(size: 16))
-                
-                TextField("Поиск по названию или платформе", text: $viewModel.searchText)
-                    .textFieldStyle(.plain)
-                    .foregroundColor(.tm.title)
-                    .autocapitalization(.none)
-                
-                if !viewModel.searchText.isEmpty {
-                    Button(action: {
-                        viewModel.searchText = ""
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.tm.subTitle)
-                    }
-                }
-            }
-            .padding(.medium)
-            .background(Color.tm.container)
-            .cornerRadius(Layout.Radius.regular)
-            
-            // Кнопка сортировки
+            TextFieldView(placeholder: "Поиск по названию или платформе", text: $viewModel.searchText, image: .search)
+                .textFieldStyle(.plain)
+                .foregroundColor(.tm.title)
+                .autocapitalization(.none)
             Button(action: {
                 showingSortOptions = true
             }) {
