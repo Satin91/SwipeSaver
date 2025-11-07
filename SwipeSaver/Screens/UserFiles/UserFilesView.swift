@@ -13,6 +13,7 @@ final class UserFilesViewModel: ObservableObject {
     let videoSaverInteractor = Executor.videoSaverInteractor
     private let userDefaultsObserver = Executor.userDefaultsObserver
     private var cancellables = Set<AnyCancellable>()
+    @Published var folders: [VideoFolder] = []
     
     @Published var searchText: String = ""
     @Published var sortOption: SortOption = .dateNewest
@@ -20,12 +21,8 @@ final class UserFilesViewModel: ObservableObject {
     
     init() {
         // Подписываемся на изменения в UserDefaultsObserver
-        userDefaultsObserver.$videoFolders
-            .sink { [weak self] _ in
-                // Триггерим обновление UI через objectWillChange
-                self?.objectWillChange.send()
-            }
-            .store(in: &cancellables)
+        self.folders = videoSaverInteractor.videoFolders
+        userDefaultsObserver.$videoFolders.assign(to: &$folders)
     }
     
     enum SortOption: String, CaseIterable {
@@ -107,8 +104,7 @@ final class UserFilesViewModel: ObservableObject {
     }
     
     func getFolderSize(_ folder: VideoFolder) -> Int64 {
-        let videos = getVideosInFolder(folder)
-        return videos.reduce(0) { $0 + $1.fileSize }
+        return folder.totalSize
     }
     
     func formatFolderSize(_ bytes: Int64) -> String {
@@ -186,12 +182,9 @@ struct UserFilesView: View {
                 .foregroundColor(.tm.title)
             
             HStack(spacing: .regular) {
-                ForEach(viewModel.videoSaverInteractor.videoFolders) { folder in
+                ForEach(viewModel.folders) { folder in
                     FolderCardView(
                         folder: folder,
-                        videosCount: viewModel.getVideosInFolder(folder).count,
-                        folderSize: viewModel.getFolderSize(folder),
-                        formattedSize: viewModel.formatFolderSize(viewModel.getFolderSize(folder)),
                         onTap: {
                             selectedFolder = folder
                         },
@@ -504,9 +497,6 @@ struct FolderDetailView: View {
 
 struct FolderCardView: View {
     let folder: VideoFolder
-    let videosCount: Int
-    let folderSize: Int64
-    let formattedSize: String
     let onTap: () -> Void
     let onDrop: (SavedVideo) -> Void
     
@@ -514,11 +504,15 @@ struct FolderCardView: View {
     @State private var scale: CGFloat = 1.0
     @EnvironmentObject var viewModel: UserFilesViewModel
     
-    var folderDescription: String {
+    private var videosCount: Int {
+        folder.items.count
+    }
+    
+    private var folderDescription: String {
         if videosCount == 0 {
             return "Пусто"
         } else {
-            return "\(videosCount) • \(formattedSize)"
+            return "\(videosCount) • \(folder.formattedSize)"
         }
     }
     

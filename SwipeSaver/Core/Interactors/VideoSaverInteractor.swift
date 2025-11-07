@@ -143,7 +143,7 @@ final class VideoSaverInteractor: ObservableObject {
         // Очищаем все папки от видео
         var folders = userDefaultsObserver.videoFolders
         for i in 0..<folders.count {
-            folders[i].videoIds.removeAll()
+            folders[i].items.removeAll()
         }
         userDefaultsObserver.updateVideoFolders(folders)
     }
@@ -155,6 +155,12 @@ final class VideoSaverInteractor: ObservableObject {
     ///   - videoId: ID видео
     ///   - toFolderId: ID папки назначения (nil для удаления из папки)
     func moveVideoToFolder(_ videoId: UUID, toFolderId: UUID?) {
+        // Находим видео для получения размера
+        guard let video = savedVideos.first(where: { $0.id == videoId }) else {
+            print("❌ Видео \(videoId) не найдено")
+            return
+        }
+        
         var folders = userDefaultsObserver.videoFolders
         
         // Удаляем видео из всех папок
@@ -165,7 +171,7 @@ final class VideoSaverInteractor: ObservableObject {
         // Добавляем в новую папку, если указана
         if let toFolderId = toFolderId,
            let folderIndex = folders.firstIndex(where: { $0.id == toFolderId }) {
-            folders[folderIndex].addVideo(videoId)
+            folders[folderIndex].addVideo(videoId, fileSize: video.fileSize)
             print("📁 Видео \(videoId) перемещено в папку \(folders[folderIndex].name)")
         } else {
             print("📁 Видео \(videoId) удалено из всех папок")
@@ -186,7 +192,8 @@ final class VideoSaverInteractor: ObservableObject {
     /// - Parameter folder: Папка
     /// - Returns: Массив видео
     func getVideosInFolder(_ folder: VideoFolder) -> [SavedVideo] {
-        return savedVideos.filter { folder.videoIds.contains($0.id) }
+        let videoIds = folder.videoIds
+        return savedVideos.filter { videoIds.contains($0.id) }
     }
     
     /// Получить видео без папки

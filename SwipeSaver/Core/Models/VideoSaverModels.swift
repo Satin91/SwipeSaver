@@ -241,6 +241,19 @@ struct SavedVideo: Codable, Identifiable {
     }
 }
 
+// MARK: - Video Folder Item
+
+/// Элемент папки с видео (содержит ID и размер файла)
+struct VideoFolderItem: Codable, Equatable {
+    let videoId: UUID
+    let fileSize: Int64
+    
+    init(videoId: UUID, fileSize: Int64) {
+        self.videoId = videoId
+        self.fileSize = fileSize
+    }
+}
+
 // MARK: - Video Folder
 
 /// Модель папки для видео
@@ -249,28 +262,49 @@ struct VideoFolder: Codable, Identifiable {
     var name: String
     var iconName: String
     var color: String // Hex color
-    var videoIds: [UUID] // Массив ID видео в папке
+    var items: [VideoFolderItem] // Элементы в папке
     let dateCreated: Date
     
-    init(id: UUID = UUID(), name: String, iconName: String, color: String, videoIds: [UUID] = [], dateCreated: Date = Date()) {
+    init(id: UUID = UUID(), name: String, iconName: String, color: String, items: [VideoFolderItem] = [], dateCreated: Date = Date()) {
         self.id = id
         self.name = name
         self.iconName = iconName
         self.color = color
-        self.videoIds = videoIds
+        self.items = items
         self.dateCreated = dateCreated
     }
     
     /// Добавить видео в папку
-    mutating func addVideo(_ videoId: UUID) {
-        if !videoIds.contains(videoId) {
-            videoIds.append(videoId)
-        }
+    mutating func addVideo(_ videoId: UUID, fileSize: Int64) {
+        // Удаляем если уже есть
+        items.removeAll { $0.videoId == videoId }
+        // Добавляем новый элемент
+        items.append(VideoFolderItem(videoId: videoId, fileSize: fileSize))
     }
     
     /// Удалить видео из папки
     mutating func removeVideo(_ videoId: UUID) {
-        videoIds.removeAll { $0 == videoId }
+        items.removeAll { $0.videoId == videoId }
+    }
+    
+    /// Проверить, содержит ли папка видео
+    func containsVideo(_ videoId: UUID) -> Bool {
+        return items.contains { $0.videoId == videoId }
+    }
+    
+    /// Получить ID всех видео в папке
+    var videoIds: [UUID] {
+        return items.map { $0.videoId }
+    }
+    
+    /// Общий размер всех видео в папке
+    var totalSize: Int64 {
+        return items.reduce(0) { $0 + $1.fileSize }
+    }
+    
+    /// Форматированный размер папки
+    var formattedSize: String {
+        return ByteCountFormatter.string(fromByteCount: totalSize, countStyle: .file)
     }
 }
 

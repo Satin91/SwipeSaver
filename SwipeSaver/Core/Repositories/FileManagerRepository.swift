@@ -246,6 +246,9 @@ final class FileManagerRepository: ObservableObject {
         // Добавляем в список сохраненных видео
         savedVideos.insert(savedVideo, at: 0)
         
+        // Сохраняем маппинг UUID
+        saveVideoIdMappings()
+        
         print("✅ Видео сохранено: \(fileName)")
         
         return savedVideo
@@ -286,6 +289,9 @@ final class FileManagerRepository: ObservableObject {
         // Добавляем в список сохраненных видео
         savedVideos.insert(savedVideo, at: 0)
         
+        // Сохраняем маппинг UUID
+        saveVideoIdMappings()
+        
         print("✅ Видео сохранено: \(fileName)")
         
         return savedVideo
@@ -300,6 +306,9 @@ final class FileManagerRepository: ObservableObject {
         // Удаляем из списка
         savedVideos.removeAll { $0.id == video.id }
         
+        // Обновляем маппинги
+        saveVideoIdMappings()
+        
         print("🗑️ Видео удалено: \(video.fileName)")
     }
     
@@ -308,6 +317,9 @@ final class FileManagerRepository: ObservableObject {
         deleteAllFiles()
         savedVideos.removeAll()
         
+        // Очищаем маппинги
+        userDefaultsService.delete(forKey: .videoIdMappings)
+        
         print("🗑️ Все видео удалены")
     }
     
@@ -315,12 +327,45 @@ final class FileManagerRepository: ObservableObject {
     private func loadSavedVideos() {
         let videoFiles = getFiles(withExtensions: ["mp4", "mov", "avi"])
         
+        // Загружаем сохраненные UUID маппинги
+        let savedMappings = userDefaultsService.load([String: String].self, forKey: .videoIdMappings) ?? [:]
+        
         savedVideos = videoFiles.map { fileInfo in
             let platform = VideoPlatform.extractFromFileName(fileInfo.fileName)
-            return SavedVideo(from: fileInfo, platform: platform, folderId: nil)
+            
+            // Пытаемся восстановить UUID из маппинга
+            let videoId: UUID
+            if let savedUUIDString = savedMappings[fileInfo.fileName],
+               let savedUUID = UUID(uuidString: savedUUIDString) {
+                videoId = savedUUID
+                print("✅ Восстановлен UUID для \(fileInfo.fileName): \(videoId)")
+            } else {
+                videoId = UUID()
+                print("🆕 Создан новый UUID для \(fileInfo.fileName): \(videoId)")
+            }
+            
+            return SavedVideo(
+                id: videoId,
+                fileName: fileInfo.fileName,
+                fileURL: fileInfo.fileURL,
+                platform: platform?.rawValue ?? "",
+                title: nil,
+                dateAdded: fileInfo.createdDate,
+                fileSize: fileInfo.fileSize
+            )
         }
         
+        // Сохраняем актуальные маппинги
+        saveVideoIdMappings()
+        
         print("📁 Загружено сохраненных видео: \(savedVideos.count)")
+    }
+    
+    /// Сохранить маппинги fileName -> UUID
+    private func saveVideoIdMappings() {
+        let mappings = Dictionary(uniqueKeysWithValues: savedVideos.map { ($0.fileName, $0.id.uuidString) })
+        userDefaultsService.save(mappings, forKey: .videoIdMappings)
+        print("💾 Сохранено маппингов UUID: \(mappings.count)")
     }
     
     /// Обновить список сохраненных видео

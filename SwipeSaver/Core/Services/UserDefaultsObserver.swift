@@ -73,7 +73,7 @@ class UserDefaultsObserver: ObservableObject {
     
     /// Получить папку, в которой находится видео (вспомогательный метод для чтения)
     func getFolderForVideo(_ videoId: UUID) -> VideoFolder? {
-        return videoFolders.first { $0.videoIds.contains(videoId) }
+        return videoFolders.first { $0.containsVideo(videoId) }
     }
     
 }

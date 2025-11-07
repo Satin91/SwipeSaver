@@ -41,6 +41,7 @@ enum UserDefaultsKeys: String, CaseIterable {
     case browserTabs = "browserTabs"
     case activeTabId = "activeTabId"
     case videoFolders = "videoFolders"
+    case videoIdMappings = "videoIdMappings"  // fileName -> UUID маппинг
     
     var key: String {
         return self.rawValue
